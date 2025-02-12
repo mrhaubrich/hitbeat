@@ -1,0 +1,41 @@
+name: flutter_desktop_template
+description: "A new Flutter project."
+
+publish_to: "none"
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.5.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # ignore: sort_pub_dependencies
+  cupertino_icons: ^1.0.8
+  flutter_modular: ^6.3.4
+
+  sidebarx:
+    git:
+      url: https://github.com/mrhaubrich/sidebarx.git
+  auto_size_text: ^3.0.0
+  super_context_menu: ^0.8.19
+
+  menubar:
+    git:
+      url: https://github.com/google/flutter-desktop-embedding.git
+      path: plugins/menubar
+      ref: 12decbe0f592e14e03223f6f2c0c7e0e2dbd70a1
+  file_picker: ^8.0.7
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  # ignore: sort_pub_dependencies
+  flutter_lints: ^4.0.0
+  very_good_analysis: ^6.0.0
+
+flutter:
+  uses-material-design: true
