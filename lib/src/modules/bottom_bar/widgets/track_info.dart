@@ -1,23 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:hitbeat/src/modules/bottom_bar/widgets/text_overflow_builder.dart';
+import 'package:hitbeat/src/modules/player/models/track.dart';
 import 'package:marquee/marquee.dart';
 
-/// {@template player_song_info}
-/// A widget that displays the song information.
+/// {@template player_track_info}
+/// A widget that displays the track information.
 /// {@endtemplate}
-class PlayerSongInfo extends StatelessWidget {
-  /// {@macro player_song_info}
-  const PlayerSongInfo({
-    required this.songName,
-    required this.artistName,
+class TrackInfo extends StatelessWidget {
+  /// {@macro player_track_info}
+  const TrackInfo({
+    required this.track,
     super.key,
   });
 
-  /// The name of the song.
-  final String songName;
-
-  /// The name of the artist.
-  final String artistName;
+  /// The name of the track.
+  final Track track;
 
   static const _songTextStyle = TextStyle(
     fontWeight: FontWeight.bold,
@@ -41,14 +38,14 @@ class PlayerSongInfo extends StatelessWidget {
         SizedBox(
           height: 20,
           child: TextOverflowBuilder(
-            text: songName,
+            text: track.name,
             style: _songTextStyle,
             builder: (context, isOverflowing) {
               if (!isOverflowing) {
-                return Text(songName, style: _songTextStyle);
+                return Text(track.name, style: _songTextStyle);
               }
               return Marquee(
-                text: songName,
+                text: track.name,
                 style: _songTextStyle,
                 blankSpace: 100,
                 startAfter: const Duration(seconds: 2),
@@ -61,14 +58,14 @@ class PlayerSongInfo extends StatelessWidget {
         SizedBox(
           height: 20,
           child: TextOverflowBuilder(
-            text: artistName,
+            text: track.artist.name,
             style: _artistTextStyle,
             builder: (context, isOverflowing) {
               if (!isOverflowing) {
-                return Text(artistName, style: _artistTextStyle);
+                return Text(track.artist.name, style: _artistTextStyle);
               }
               return Marquee(
-                text: artistName,
+                text: track.artist.name,
                 style: _artistTextStyle,
                 blankSpace: 100,
                 startAfter: const Duration(seconds: 2),

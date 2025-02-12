@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:hitbeat/src/modules/bottom_bar/widgets/album_cover.dart';
 import 'package:hitbeat/src/modules/bottom_bar/widgets/playback_controls.dart';
-import 'package:hitbeat/src/modules/bottom_bar/widgets/song_info.dart';
+import 'package:hitbeat/src/modules/bottom_bar/widgets/track_info.dart';
 import 'package:hitbeat/src/modules/bottom_bar/widgets/volume_control.dart';
+import 'package:hitbeat/src/modules/player/models/album.dart';
+import 'package:hitbeat/src/modules/player/models/artist.dart';
+import 'package:hitbeat/src/modules/player/models/track.dart';
 
 /// The height of the bottom bar.
 const kBottomBarHeight = 80.0;
@@ -13,6 +16,29 @@ const kBottomBarHeight = 80.0;
 class BottomBar extends StatelessWidget {
   /// {@macro bottom_bar}
   const BottomBar({super.key});
+
+  /// The track that is currently playing
+  static const Track _track = Track(
+    name: 'Rockstar',
+    path: 'path/to/song.mp3',
+    album: Album(
+      name: 'Beerbongs & Bentleys',
+      cover: 'https://i.scdn.co/image/ab67616d0000b273b1c4b76e23414c9f20242268',
+      tracks: [],
+      artist: Artist(
+        name: 'Post Malone',
+        image:
+            'https://i.scdn.co/image/ab67616d0000b273b1c4b76e23414c9f20242268',
+        albums: [],
+      ),
+    ),
+    artist: Artist(
+      name: 'Post Malone',
+      image: 'https://i.scdn.co/image/ab67616d0000b273b1c4b76e23414c9f20242268',
+      albums: [],
+    ),
+    duration: Duration(minutes: 3, seconds: 38),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -32,21 +58,17 @@ class BottomBar extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Flexible(
+              Flexible(
                 flex: 20,
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     AlbumCover.network(
-                      url:
-                          'https://i.scdn.co/image/ab67616d0000b273b1c4b76e23414c9f20242268',
+                      url: _track.album.cover,
                     ),
-                    Expanded(
-                      child: PlayerSongInfo(
-                        songName:
-                            'Very Very Long Song Name That is Very Long Even '
-                            'More Long',
-                        artistName: 'Artist Name',
+                    const Expanded(
+                      child: TrackInfo(
+                        track: _track,
                       ),
                     ),
                   ],
@@ -61,7 +83,7 @@ class BottomBar extends StatelessWidget {
                   onPrevious: () {},
                   onRepeat: () {},
                   onShuffle: () {},
-                  duration: const Duration(minutes: 3, seconds: 30),
+                  duration: _track.duration,
                   position: const Duration(minutes: 1, seconds: 30),
                   onSeek: (position) {},
                 ),
