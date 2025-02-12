@@ -1,5 +1,5 @@
 import 'package:hitbeat/src/modules/player/enums/repeat.dart';
-import 'package:hitbeat/src/modules/player/interfaces/track.dart';
+import 'package:hitbeat/src/modules/player/models/track.dart';
 
 // typedef TimeUpdateCallback = void Function();
 // typedef ErrorCallback = void Function(Error error);

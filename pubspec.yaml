@@ -31,6 +31,8 @@ dependencies:
   interactive_slider: ^0.5.1
   marquee: ^2.3.0
   cached_network_image: ^3.4.1
+  just_audio: ^0.9.46
+  equatable: ^2.0.7
 
 dev_dependencies:
   flutter_test:
