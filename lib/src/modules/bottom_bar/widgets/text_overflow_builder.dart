@@ -26,24 +26,80 @@ class TextOverflowBuilder extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final textSpan = TextSpan(text: text, style: style);
-        final textPainter = TextPainter(
-          text: textSpan,
-          maxLines: 1,
-          textDirection: TextDirection.ltr,
-          textWidthBasis: TextWidthBasis.longestLine,
-          strutStyle: StrutStyle.fromTextStyle(style!),
-          ellipsis: '...',
-        )..layout(maxWidth: constraints.maxWidth);
-
-        // If the text fits exactly or is very close to the constraint width,
-        // it will need ellipsis, so we consider it overflowing
-        const threshold = 15; // Small buffer to account for rounding
-        final isOverflowing =
-            textPainter.width >= (constraints.maxWidth - threshold);
-
-        return builder(context, isOverflowing);
+        return _MemoizedTextOverflow(
+          text: text,
+          style: style,
+          width: constraints.maxWidth,
+          builder: builder,
+        );
       },
     );
   }
+}
+
+class _MemoizedTextOverflow extends StatefulWidget {
+  const _MemoizedTextOverflow({
+    required this.text,
+    required this.style,
+    required this.width,
+    required this.builder,
+  });
+
+  final String text;
+  final TextStyle? style;
+  final double width;
+  final Widget Function(BuildContext, bool) builder;
+
+  @override
+  State<_MemoizedTextOverflow> createState() => _MemoizedTextOverflowState();
+}
+
+class _MemoizedTextOverflowState extends State<_MemoizedTextOverflow> {
+  late bool _isOverflowing;
+
+  @override
+  void initState() {
+    super.initState();
+    _isOverflowing = _calculateOverflow(
+      text: widget.text,
+      width: widget.width,
+      style: widget.style,
+    );
+  }
+
+  @override
+  void didUpdateWidget(_MemoizedTextOverflow oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.width != widget.width ||
+        oldWidget.text != widget.text ||
+        oldWidget.style != widget.style) {
+      _isOverflowing = _calculateOverflow(
+        text: widget.text,
+        width: widget.width,
+        style: widget.style,
+      );
+    }
+  }
+
+  bool _calculateOverflow({
+    required String text,
+    required double width,
+    TextStyle? style,
+  }) {
+    final textSpan = TextSpan(text: widget.text, style: widget.style);
+    final textPainter = TextPainter(
+      text: textSpan,
+      maxLines: 1,
+      textDirection: TextDirection.ltr,
+      textWidthBasis: TextWidthBasis.longestLine,
+      strutStyle: StrutStyle.fromTextStyle(widget.style!),
+      ellipsis: '...',
+    )..layout(maxWidth: widget.width);
+
+    const threshold = 15;
+    return textPainter.width >= (widget.width - threshold);
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.builder(context, _isOverflowing);
 }
