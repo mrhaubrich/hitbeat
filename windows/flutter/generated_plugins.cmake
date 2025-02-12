@@ -4,6 +4,7 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   irondash_engine_context
+  media_kit_libs_windows_audio
   menubar
   super_native_extensions
 )

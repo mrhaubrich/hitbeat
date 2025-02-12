@@ -7,5 +7,16 @@ enum Repeat {
   one,
 
   /// Repeat the entire tracklist
-  all,
+  all;
+
+  Repeat get next {
+    switch (this) {
+      case Repeat.none:
+        return Repeat.one;
+      case Repeat.one:
+        return Repeat.all;
+      case Repeat.all:
+        return Repeat.none;
+    }
+  }
 }

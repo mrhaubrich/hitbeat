@@ -46,7 +46,6 @@ class _VolumeControlState extends State<VolumeControl> {
                   style: const TextStyle(color: Colors.white, fontSize: 12),
                 ),
           onProgressUpdated: (value) {
-            widget.onVolumeChanged(value);
             setState(() {
               hoverVolume = null;
             });
@@ -57,6 +56,7 @@ class _VolumeControlState extends State<VolumeControl> {
             });
           },
           onChanged: (value) {
+            widget.onVolumeChanged(value);
             setState(() {
               hoverVolume = value;
             });
