@@ -54,20 +54,50 @@ class _PlaybackControlsState extends State<PlaybackControls>
             spacing: 4,
             children: [
               _ControlButton(
-                icon: Icons.skip_previous,
+                icon: const Icon(
+                  Icons.repeat,
+                  color: Colors.white70,
+                  size: 16,
+                ),
                 onPressed: () {},
-                type: _ButtonType.previous,
+                size: 16,
               ),
               _ControlButton(
-                icon: Icons.play_arrow,
+                icon: const Icon(
+                  Icons.skip_previous,
+                  color: Colors.white,
+                  size: 24,
+                ),
+                onPressed: () {},
+                size: 24,
+              ),
+              _ControlButton(
+                icon: AnimatedIcon(
+                  icon: AnimatedIcons.play_pause,
+                  progress: _controller,
+                  color: Colors.white,
+                  size: 36,
+                ),
                 onPressed: _togglePlayPause,
-                type: _ButtonType.play,
-                controller: _controller,
+                size: 36,
               ),
               _ControlButton(
-                icon: Icons.skip_next,
+                icon: const Icon(
+                  Icons.skip_next,
+                  color: Colors.white,
+                  size: 24,
+                ),
                 onPressed: () {},
-                type: _ButtonType.next,
+                size: 24,
+              ),
+              _ControlButton(
+                icon: const Icon(
+                  Icons.shuffle,
+                  color: Colors.white70,
+                  size: 16,
+                ),
+                onPressed: () {},
+                size: 16,
               ),
             ],
           ),
@@ -82,35 +112,19 @@ class _PlaybackControlsState extends State<PlaybackControls>
   }
 }
 
-enum _ButtonType { previous, play, next }
-
 class _ControlButton extends StatelessWidget {
   const _ControlButton({
     required this.icon,
     required this.onPressed,
-    required this.type,
-    this.controller,
+    this.size = 32,
   });
 
-  final IconData icon;
+  final Widget icon;
   final VoidCallback onPressed;
-  final _ButtonType type;
-  final AnimationController? controller;
+  final double size;
 
   @override
   Widget build(BuildContext context) {
-    Widget iconWidget;
-
-    if (type == _ButtonType.play) {
-      iconWidget = AnimatedIcon(
-        icon: AnimatedIcons.play_pause,
-        progress: controller ?? const AlwaysStoppedAnimation(0),
-        color: Colors.white,
-      );
-    } else {
-      iconWidget = Icon(icon, color: Colors.white);
-    }
-
     return IconButtonTheme(
       data: IconButtonThemeData(
         style: ButtonStyle(
@@ -121,7 +135,7 @@ class _ControlButton extends StatelessWidget {
         ),
       ),
       child: IconButton(
-        icon: iconWidget,
+        icon: icon,
         onPressed: onPressed,
       ),
     );
