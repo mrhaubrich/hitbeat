@@ -69,14 +69,14 @@ class Sidebar extends StatelessWidget {
         selectedItemDecoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
-            color: actionColor.withOpacity(0.37),
+            color: actionColor.withValues(alpha: 0.37),
           ),
           gradient: const LinearGradient(
             colors: [accentCanvasColor, canvasColor],
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.28),
+              color: Colors.black.withValues(alpha: 0.28),
               blurRadius: 30,
             ),
           ],
