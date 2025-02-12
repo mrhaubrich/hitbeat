@@ -36,6 +36,16 @@ public final class GeneratedPluginRegistrant {
       Log.e(TAG, "Error registering plugin irondash_engine_context, dev.irondash.engine_context.IrondashEngineContextPlugin", e);
     }
     try {
+      flutterEngine.getPlugins().add(new io.flutter.plugins.pathprovider.PathProviderPlugin());
+    } catch (Exception e) {
+      Log.e(TAG, "Error registering plugin path_provider_android, io.flutter.plugins.pathprovider.PathProviderPlugin", e);
+    }
+    try {
+      flutterEngine.getPlugins().add(new com.tekartik.sqflite.SqflitePlugin());
+    } catch (Exception e) {
+      Log.e(TAG, "Error registering plugin sqflite_android, com.tekartik.sqflite.SqflitePlugin", e);
+    }
+    try {
       flutterEngine.getPlugins().add(new com.superlist.super_native_extensions.SuperNativeExtensionsPlugin());
     } catch (Exception e) {
       Log.e(TAG, "Error registering plugin super_native_extensions, com.superlist.super_native_extensions.SuperNativeExtensionsPlugin", e);

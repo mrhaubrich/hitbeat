@@ -37,20 +37,34 @@ class BottomBar extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    PlayerAlbumCover(),
+                    AlbumCover.network(
+                      url:
+                          'https://i.scdn.co/image/ab67616d0000b273b1c4b76e23414c9f20242268',
+                    ),
                     Expanded(
                       child: PlayerSongInfo(
                         songName:
-                            'Very Very Long Song Name That is Very Long Even More Long',
+                            'Very Very Long Song Name That is Very Long Even '
+                            'More Long',
                         artistName: 'Artist Name',
                       ),
                     ),
                   ],
                 ),
               ),
-              const Flexible(
+              Flexible(
                 flex: 60,
-                child: PlaybackControls(),
+                child: PlaybackControls(
+                  isPlaying: true,
+                  onPlayPause: () {},
+                  onNext: () {},
+                  onPrevious: () {},
+                  onRepeat: () {},
+                  onShuffle: () {},
+                  duration: const Duration(minutes: 3, seconds: 30),
+                  position: const Duration(minutes: 1, seconds: 30),
+                  onSeek: (position) {},
+                ),
               ),
               Flexible(
                 flex: 20,
