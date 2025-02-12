@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_desktop_template/src/modules/home/controllers/bottom_bar_controller.dart';
-import 'package:flutter_desktop_template/src/modules/home/controllers/menu_bar_controller.dart';
-import 'package:flutter_desktop_template/src/modules/home/widgets/miolo.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:hitbeat/src/modules/home/controllers/bottom_bar_controller.dart';
+import 'package:hitbeat/src/modules/home/controllers/menu_bar_controller.dart';
+import 'package:hitbeat/src/modules/home/widgets/miolo.dart';
 
 /// The Settings page of the application.
 class SettingsPage extends StatelessWidget {

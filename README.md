@@ -4,13 +4,13 @@
   alt="Flutter logo"></a>
 </p>
 
-<h3 align="center">Flutter Desktop</h3>
+<h3 align="center">HitBeat</h3>
 
 <div align="center">
 
 [![Status](https://img.shields.io/badge/status-active-success.svg)]()
-[![GitHub Issues](https://img.shields.io/github/issues/mrhaubrich/flutter_desktop_template.svg)](https://github.com/mrhaubrich/flutter_desktop_template/issues)
-[![GitHub Pull Requests](https://img.shields.io/github/issues-pr/mrhaubrich/flutter_desktop_template.svg)](https://github.com/mrhaubrich/flutter_desktop_template/pulls)
+[![GitHub Issues](https://img.shields.io/github/issues/mrhaubrich/hitbeat.svg)](https://github.com/mrhaubrich/hitbeat/issues)
+[![GitHub Pull Requests](https://img.shields.io/github/issues-pr/mrhaubrich/hitbeat.svg)](https://github.com/mrhaubrich/hitbeat/pulls)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](/LICENSE)
 
 </div>
@@ -67,6 +67,6 @@ flutter run
 
 - [@mrhaubrich](https://github.com/mrhaubrich) - Idea & Initial work
 
-See also the list of [contributors](https://github.com/mrhaubrich/flutter_desktop_template/contributors) who participated in this project.
+See also the list of [contributors](https://github.com/mrhaubrich/hitbeat/contributors) who participated in this project.
 
 [todoReference]: TODO.md

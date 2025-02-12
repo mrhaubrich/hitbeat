@@ -1,5 +1,5 @@
-import 'package:flutter_desktop_template/src/modules/home/modules/settings/pages/settings_page.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:hitbeat/src/modules/home/modules/settings/pages/settings_page.dart';
 
 /// The Settings module of the application.
 class SettingsModule extends Module {

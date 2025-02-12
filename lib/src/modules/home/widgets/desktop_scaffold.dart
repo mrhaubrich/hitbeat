@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_desktop_template/src/modules/home/widgets/bottom_bar.dart';
-import 'package:flutter_desktop_template/src/modules/home/widgets/sidebar.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:hitbeat/src/modules/home/widgets/bottom_bar.dart';
+import 'package:hitbeat/src/modules/home/widgets/sidebar.dart';
 
 /// A scaffold with a sidebar.
 class DesktopScaffold extends StatelessWidget {

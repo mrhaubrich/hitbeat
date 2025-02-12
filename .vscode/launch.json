@@ -5,18 +5,18 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "flutter_desktop_template",
+            "name": "hitbeat",
             "request": "launch",
             "type": "dart"
         },
         {
-            "name": "flutter_desktop_template (profile mode)",
+            "name": "hitbeat (profile mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "profile"
         },
         {
-            "name": "flutter_desktop_template (release mode)",
+            "name": "hitbeat (release mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "release"

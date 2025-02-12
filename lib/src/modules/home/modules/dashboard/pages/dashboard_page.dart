@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_desktop_template/src/modules/home/widgets/example_card.dart';
-import 'package:flutter_desktop_template/src/modules/home/widgets/example_context_menu.dart';
-import 'package:flutter_desktop_template/src/modules/home/widgets/miolo.dart';
+import 'package:hitbeat/src/modules/home/widgets/example_card.dart';
+import 'package:hitbeat/src/modules/home/widgets/example_context_menu.dart';
+import 'package:hitbeat/src/modules/home/widgets/miolo.dart';
 
 /// The Dashboard page of the application.
 class DashboardPage extends StatelessWidget {

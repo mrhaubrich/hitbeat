@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_desktop_template/src/colors.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:hitbeat/src/colors.dart';
 import 'package:sidebarx/sidebarx.dart';
 
 /// Sidebar controller.
@@ -117,7 +117,7 @@ class Sidebar extends StatelessWidget {
                       ? const EdgeInsets.only(top: 10)
                       : EdgeInsets.zero,
                   child: const Text(
-                    'Flutter Desktop',
+                    'HitBeat',
                     style: TextStyle(
                       color: white,
                       fontSize: 24,

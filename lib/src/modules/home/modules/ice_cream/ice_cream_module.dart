@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_desktop_template/src/modules/home/widgets/miolo.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:hitbeat/src/modules/home/widgets/miolo.dart';
 
 /// The Ice-Cream module of the application.
 class IceCreamModule extends Module {

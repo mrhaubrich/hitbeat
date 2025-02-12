@@ -1,5 +1,5 @@
-import 'package:flutter_desktop_template/src/modules/home/modules/dashboard/pages/dashboard_page.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:hitbeat/src/modules/home/modules/dashboard/pages/dashboard_page.dart';
 
 /// The Dashboard module of the application.
 class DashboardModule extends Module {

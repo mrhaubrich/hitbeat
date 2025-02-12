@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_desktop_template/src/modules/home/widgets/desktop_scaffold.dart';
+import 'package:hitbeat/src/modules/home/widgets/desktop_scaffold.dart';
 
 /// The Home page of the application.
 class HomePage extends StatelessWidget {
