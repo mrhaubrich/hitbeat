@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
-import 'package:hitbeat/src/modules/home/controllers/bottom_bar_controller.dart';
 import 'package:hitbeat/src/modules/home/controllers/menu_bar_controller.dart';
 import 'package:hitbeat/src/modules/home/widgets/miolo.dart';
 
@@ -18,19 +17,6 @@ class SettingsPage extends StatelessWidget {
       ),
       child: Column(
         children: [
-          ListenableBuilder(
-            listenable: Modular.get<BottomBarController>(),
-            builder: (context, snapshot) {
-              return SwitchListTile(
-                value: Modular.get<BottomBarController>().isBottomBarVisible,
-                onChanged: (value) {
-                  Modular.get<BottomBarController>().isBottomBarVisible = value;
-                },
-                title: const Text('Show Bottom Bar'),
-                subtitle: const Text('Show or hide the bottom bar.'),
-              );
-            },
-          ),
           ValueListenableBuilder(
             valueListenable: Modular.get<MenuBarController>().isToggled,
             builder: (context, value, child) {

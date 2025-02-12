@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_modular/flutter_modular.dart';
 import 'package:hitbeat/src/modules/bottom_bar/widgets/album_cover.dart';
 import 'package:hitbeat/src/modules/bottom_bar/widgets/playback_controls.dart';
 import 'package:hitbeat/src/modules/bottom_bar/widgets/song_info.dart';
 import 'package:hitbeat/src/modules/bottom_bar/widgets/volume_control.dart';
-import 'package:hitbeat/src/modules/home/controllers/bottom_bar_controller.dart';
 
+/// The height of the bottom bar.
 const kBottomBarHeight = 80.0;
 
 /// {@template bottom_bar}
@@ -17,25 +16,19 @@ class BottomBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: Modular.get<BottomBarController>(),
-      builder: (context, child) {
-        final controller = Modular.get<BottomBarController>();
-        return AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOutCirc,
-          height: controller.isBottomBarVisible ? kBottomBarHeight : 0,
-          margin: EdgeInsets.only(
-            bottom: controller.isBottomBarVisible ? 10 : 0,
-            left: 10,
-            right: 10,
-          ),
-          decoration: BoxDecoration(
-            color: Theme.of(context).primaryColor.withValues(alpha: 0.9),
-            borderRadius: controller.isBottomBarVisible
-                ? const BorderRadius.all(Radius.circular(14))
-                : null,
-          ),
+    return Container(
+      margin: const EdgeInsets.only(
+        bottom: 10,
+        left: 10,
+        right: 10,
+      ),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: Theme.of(context).primaryColor.withValues(alpha: 0.9),
+          borderRadius: const BorderRadius.all(Radius.circular(14)),
+        ),
+        child: SizedBox(
+          height: kBottomBarHeight,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -45,7 +38,13 @@ class BottomBar extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     PlayerAlbumCover(),
-                    PlayerSongInfo(),
+                    Expanded(
+                      child: PlayerSongInfo(
+                        songName:
+                            'Very Very Long Song Name That is Very Long Even More Long',
+                        artistName: 'Artist Name',
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -62,8 +61,8 @@ class BottomBar extends StatelessWidget {
               ),
             ],
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }
