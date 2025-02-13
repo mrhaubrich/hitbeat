@@ -4,6 +4,7 @@ import 'package:hitbeat/src/modules/player/enums/repeat.dart';
 import 'package:hitbeat/src/modules/player/interfaces/player.dart';
 import 'package:hitbeat/src/modules/player/models/track.dart';
 import 'package:just_audio/just_audio.dart' as just_audio;
+import 'package:rxdart/rxdart.dart';
 
 /// {@template audio_player}
 /// An audio player that plays audio files.
@@ -15,11 +16,26 @@ class AudioPlayer implements IAudioPlayer {
     _playlist = just_audio.ConcatenatingAudioSource(children: []);
     _shuffle = false;
     _repeat = Repeat.none;
+    _trackController = BehaviorSubject<Track?>();
+    _timeController = BehaviorSubject<Duration>();
     _initializePlayer();
+
+    // Add listener for playback completion
+    _player.playerStateStream.listen((state) async {
+      if (state.processingState == just_audio.ProcessingState.completed) {
+        final firstTrack = _playlist.sequence.firstOrNull?.tag as Track?;
+        Future.delayed(const Duration(milliseconds: 500), () {
+          _trackController.add(firstTrack);
+          _timeController.add(Duration.zero);
+        });
+      }
+    });
   }
 
   late final just_audio.AudioPlayer _player;
   late final just_audio.ConcatenatingAudioSource _playlist;
+  late final BehaviorSubject<Track?> _trackController;
+  late final BehaviorSubject<Duration> _timeController;
   late bool _shuffle;
   late Repeat _repeat;
 
@@ -35,6 +51,8 @@ class AudioPlayer implements IAudioPlayer {
   @override
   Future<void> dispose() async {
     await _player.dispose();
+    await _trackController.close();
+    await _timeController.close();
   }
 
   @override
@@ -168,17 +186,19 @@ class AudioPlayer implements IAudioPlayer {
   }
 
   @override
-  Stream<Duration> get currentTime$ => _player.positionStream;
+  Stream<Duration> get currentTime$ =>
+      Rx.merge([_player.positionStream, _timeController.stream]);
 
   @override
-  Stream<Track?> get currentTrack$ => _player.currentIndexStream.map(
-        (index) {
+  Stream<Track?> get currentTrack$ => Rx.merge([
+        _player.currentIndexStream.map((index) {
           if (index != null) {
             return _playlist.sequence[index].tag as Track;
           }
           return null;
-        },
-      );
+        }),
+        _trackController.stream,
+      ]);
 
   @override
   Stream<double> get volume$ => _player.volumeStream;
