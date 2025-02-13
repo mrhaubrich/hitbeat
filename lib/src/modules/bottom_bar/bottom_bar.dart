@@ -27,32 +27,35 @@ class BottomBar extends StatefulWidget {
 
 class _BottomBarState extends State<BottomBar> {
   final IAudioPlayer _player = Modular.get<IAudioPlayer>();
-  late final StreamSubscription<Track> _trackSubscription;
+  late final StreamSubscription<Track?> _trackSubscription;
   late final StreamSubscription<Duration> _positionSubscription;
   Track? _currentTrack;
   Duration _position = Duration.zero;
 
   /// The track that is currently playing
   static const Track _track = Track(
-    name: 'Rockstar',
-    path: 'assets/songs/Post_Malone_-_Circles.mp3',
+    name: 'Circles',
+    path:
+        '/home/marhaubrich/Music/Post Malone - Hollywoods Bleeding [FlexyOkay.com]/Post_Malone_-_Circles_FlexyOkay.com.mp3',
     album: Album(
-      name: 'Beerbongs & Bentleys',
-      cover: 'https://i.scdn.co/image/ab67616d0000b273b1c4b76e23414c9f20242268',
+      name: "Hollywood's Bleeding",
+      cover:
+          'https://cdna.artstation.com/p/assets/images/images/028/352/344/large/sharjeel-khan-post-malone-hollywood-bleeding-cover-art-by-me3.jpg?1594221623',
       tracks: [],
       artist: Artist(
         name: 'Post Malone',
         image:
-            'https://i.scdn.co/image/ab67616d0000b273b1c4b76e23414c9f20242268',
+            'https://cdna.artstation.com/p/assets/images/images/028/352/344/large/sharjeel-khan-post-malone-hollywood-bleeding-cover-art-by-me3.jpg?1594221623',
         albums: [],
       ),
     ),
     artist: Artist(
       name: 'Post Malone',
-      image: 'https://i.scdn.co/image/ab67616d0000b273b1c4b76e23414c9f20242268',
+      image:
+          'https://cdna.artstation.com/p/assets/images/images/028/352/344/large/sharjeel-khan-post-malone-hollywood-bleeding-cover-art-by-me3.jpg?1594221623',
       albums: [],
     ),
-    duration: Duration(minutes: 3, seconds: 38),
+    duration: Duration(minutes: 3, seconds: 36),
   );
 
   @override
@@ -133,7 +136,7 @@ class _BottomBarState extends State<BottomBar> {
                   stream: _player.volume$,
                   builder: (context, snapshot) {
                     return VolumeControl(
-                      volume: snapshot.data!,
+                      volume: snapshot.data ?? 1,
                       onVolumeChanged: (volume) async {
                         await _player.setVolume(volume);
                       },

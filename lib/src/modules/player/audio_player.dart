@@ -9,7 +9,7 @@ import 'package:just_audio/just_audio.dart' as just_audio;
 class AudioPlayer implements IAudioPlayer {
   /// {@macro audio_player}
   AudioPlayer() {
-    _player = just_audio.AudioPlayer();
+    _player = just_audio.AudioPlayer()..setVolume(1);
     _tracklist = [];
     _currentIndex = 0;
     _shuffle = false;
@@ -146,7 +146,7 @@ class AudioPlayer implements IAudioPlayer {
   Stream<Duration> get currentTime$ => _player.positionStream;
 
   @override
-  Stream<Track> get currentTrack$ =>
+  Stream<Track?> get currentTrack$ =>
       _player.currentIndexStream.map((index) => _tracklist[index ?? 0]);
 
   @override

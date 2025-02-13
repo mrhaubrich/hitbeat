@@ -81,7 +81,7 @@ abstract class IAudioPlayer {
   Stream<Duration> get currentTime$;
 
   /// Stream of the current track
-  Stream<Track> get currentTrack$;
+  Stream<Track?> get currentTrack$;
 
   /// Stream of the current volume
   Stream<double> get volume$;

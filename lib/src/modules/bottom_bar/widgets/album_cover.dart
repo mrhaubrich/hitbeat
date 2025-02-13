@@ -18,6 +18,7 @@ class AlbumCover extends StatelessWidget {
     this.imageUrl,
     this.imageFile,
     this.imageBytes,
+    this.assetPath,
   });
 
   /// Creates an album cover from a network URL
@@ -77,6 +78,25 @@ class AlbumCover extends StatelessWidget {
           placeholderIcon: placeholderIcon,
         );
 
+  /// Creates an album cover from an asset
+  const AlbumCover.asset({
+    required String path,
+    Key? key,
+    double size = 64,
+    EdgeInsets padding = const EdgeInsets.all(8),
+    double borderRadius = 8,
+    Color? backgroundColor,
+    Widget placeholderIcon = const Icon(Icons.album, size: 32),
+  }) : this._(
+          key: key,
+          assetPath: path,
+          size: size,
+          padding: padding,
+          borderRadius: borderRadius,
+          backgroundColor: backgroundColor,
+          placeholderIcon: placeholderIcon,
+        );
+
   /// The URL of the image to display.
   final String? imageUrl;
 
@@ -85,6 +105,9 @@ class AlbumCover extends StatelessWidget {
 
   /// The bytes of the image to display.
   final Uint8List? imageBytes;
+
+  /// The asset path of the image to display.
+  final String? assetPath;
 
   /// The size of the album cover.
   final double size;
@@ -140,6 +163,14 @@ class AlbumCover extends StatelessWidget {
     if (imageBytes != null) {
       return Image.memory(
         imageBytes!,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => placeholderIcon,
+      );
+    }
+
+    if (assetPath != null) {
+      return Image.asset(
+        assetPath!,
         fit: BoxFit.cover,
         errorBuilder: (context, error, stackTrace) => placeholderIcon,
       );

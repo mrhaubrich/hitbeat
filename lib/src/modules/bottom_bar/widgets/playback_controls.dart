@@ -86,7 +86,7 @@ class _PlaybackControlsState extends State<PlaybackControls>
                 builder: (context, snapshot) {
                   return _ControlButton(
                     icon: Icon(
-                      snapshot.data!.icon,
+                      snapshot.data?.icon,
                       color: Colors.white70,
                       size: 16,
                     ),
