@@ -70,16 +70,7 @@ class _BottomBarState extends State<BottomBar> {
   }
 
   Future<void> _initializeTracks() async {
-    if (_player.tracklist.isEmpty) {
-      try {
-        _player.concatTracks(_tracks);
-      } catch (e) {
-        print('Error initializing tracks: $e');
-        // Retry after a delay
-        await Future.delayed(const Duration(seconds: 1));
-        _player.concatTracks(_tracks);
-      }
-    }
+    _player.concatTracks(_tracks);
   }
 
   @override
