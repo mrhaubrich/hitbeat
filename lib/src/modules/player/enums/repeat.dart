@@ -1,14 +1,28 @@
-/// Enum for repeat modes.
+import 'package:flutter/material.dart' show Icons;
+import 'package:flutter/widgets.dart';
+
+/// {@template repeat}
+/// The repeat mode of the player.
+/// {@endtemplate}
 enum Repeat {
   /// No repeat
-  none,
+  none(icon: Icons.repeat),
 
   /// Repeat the current track
-  one,
+  one(icon: Icons.repeat_one),
 
   /// Repeat the entire tracklist
-  all;
+  all(icon: Icons.repeat_on);
 
+  /// {@macro repeat}
+  const Repeat({
+    required this.icon,
+  });
+
+  /// The icon of the repeat mode
+  final IconData icon;
+
+  /// Get the next repeat mode
   Repeat get next {
     switch (this) {
       case Repeat.none:

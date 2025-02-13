@@ -117,18 +117,9 @@ class _BottomBarState extends State<BottomBar> {
               Flexible(
                 flex: 60,
                 child: PlaybackControls(
-                  isPlaying: _player.isPlaying,
-                  onPlayPause: () {
-                    _player.setIsPlaying(isPlaying: !_player.isPlaying);
-                  },
+                  player: _player,
                   onNext: _player.next,
                   onPrevious: _player.previous,
-                  onRepeat: () async {
-                    await _player.setRepeat(_player.repeat.next);
-                  },
-                  onShuffle: () async {
-                    await _player.setShuffle(shuffle: !_player.shuffle);
-                  },
                   duration: currentTrack.duration,
                   position: _position,
                   onSeek: (position) async {
