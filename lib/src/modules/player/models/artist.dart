@@ -23,4 +23,11 @@ class Artist extends Equatable {
 
   @override
   List<Object?> get props => [name, image, albums];
+
+  /// An empty artist
+  static Artist empty = const Artist(
+    name: 'Select an artist',
+    image: '',
+    albums: [],
+  );
 }

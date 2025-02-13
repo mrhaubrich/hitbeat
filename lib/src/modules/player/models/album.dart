@@ -28,4 +28,12 @@ class Album extends Equatable {
 
   @override
   List<Object?> get props => [name, cover, tracks, artist];
+
+  /// An empty album
+  static Album empty = Album(
+    name: 'Select an album',
+    cover: '',
+    tracks: const [],
+    artist: Artist.empty,
+  );
 }

@@ -144,6 +144,7 @@ class AlbumCover extends StatelessWidget {
     if (imageUrl != null) {
       return CachedNetworkImage(
         imageUrl: imageUrl!,
+        useOldImageOnUrlChange: true,
         fit: BoxFit.cover,
         placeholder: (context, url) => const Center(
           child: CircularProgressIndicator(),

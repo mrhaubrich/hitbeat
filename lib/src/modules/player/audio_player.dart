@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:hitbeat/src/modules/player/enums/repeat.dart';
 import 'package:hitbeat/src/modules/player/interfaces/player.dart';
 import 'package:hitbeat/src/modules/player/models/track.dart';
@@ -10,69 +12,85 @@ class AudioPlayer implements IAudioPlayer {
   /// {@macro audio_player}
   AudioPlayer() {
     _player = just_audio.AudioPlayer()..setVolume(1);
-    _tracklist = [];
-    _currentIndex = 0;
+    _playlist = just_audio.ConcatenatingAudioSource(children: []);
     _shuffle = false;
     _repeat = Repeat.none;
+    _initializePlayer();
   }
 
   late final just_audio.AudioPlayer _player;
-  late final List<Track> _tracklist;
-  late int _currentIndex;
+  late final just_audio.ConcatenatingAudioSource _playlist;
   late bool _shuffle;
   late Repeat _repeat;
 
-  @override
-  List<Track> get tracklist => _tracklist;
+  Future<void> _initializePlayer() async {
+    await _player.setAudioSource(_playlist);
+  }
 
   @override
-  void dispose() {
-    _player.dispose();
+  List<Track> get tracklist {
+    return _playlist.sequence.map((source) => source.tag as Track).toList();
+  }
+
+  @override
+  Future<void> dispose() async {
+    await _player.dispose();
+  }
+
+  @override
+  Future<void> addTrack(Track newSong) {
+    return _playlist.add(
+      just_audio.AudioSource.uri(
+        Uri.parse(newSong.path),
+        tag: newSong,
+      ),
+    );
   }
 
   @override
   Future<void> setTrack(Track newSong) async {
-    await _player.setAudioSource(
-      just_audio.AudioSource.uri(Uri.parse(newSong.path)),
+    await _playlist.clear();
+    await _playlist.add(
+      just_audio.AudioSource.uri(
+        Uri.parse(newSong.path),
+        tag: newSong,
+      ),
     );
-    _tracklist
-      ..clear()
-      ..add(newSong);
-    _currentIndex = 0;
+    await _player.seek(Duration.zero, index: 0);
   }
 
   @override
   void clearTracklist() {
-    _tracklist.clear();
-    _currentIndex = 0;
+    _playlist.clear();
     _player.stop();
   }
 
   @override
-  void concatTracks(List<Track> songs) {
-    _tracklist.addAll(songs);
+  Future<void> concatTracks(List<Track> songs) {
+    return _playlist.addAll(
+      songs
+          .map(
+            (song) => just_audio.AudioSource.uri(
+              Uri.parse(song.path),
+              tag: song,
+            ),
+          )
+          .toList(),
+    );
   }
 
   @override
   Future<void> next() async {
-    if (_currentIndex < _tracklist.length - 1) {
-      _currentIndex++;
-      await setTrack(_tracklist[_currentIndex]);
-    } else if (_repeat == Repeat.all) {
-      _currentIndex = 0;
-      await setTrack(_tracklist[_currentIndex]);
-    }
+    await _player.seekToNext();
   }
 
   @override
   Future<void> previous() async {
-    if (_currentIndex > 0) {
-      _currentIndex--;
-      await setTrack(_tracklist[_currentIndex]);
-    } else if (_repeat == Repeat.all) {
-      _currentIndex = _tracklist.length - 1;
-      await setTrack(_tracklist[_currentIndex]);
+    if (_player.position.inSeconds > 5) {
+      await _player.seek(Duration.zero, index: _player.currentIndex);
+      return;
     }
+    await _player.seekToPrevious();
   }
 
   @override
@@ -81,9 +99,16 @@ class AudioPlayer implements IAudioPlayer {
   @override
   void setShuffle({required bool shuffle}) {
     _shuffle = shuffle;
-    if (shuffle) {
-      _tracklist.shuffle();
+    _player.setShuffleModeEnabled(shuffle);
+  }
+
+  @override
+  Track? get currentTrack {
+    final index = _player.currentIndex;
+    if (index != null) {
+      return _playlist.sequence[index].tag as Track;
     }
+    return null;
   }
 
   @override
@@ -147,7 +172,12 @@ class AudioPlayer implements IAudioPlayer {
 
   @override
   Stream<Track?> get currentTrack$ => _player.currentIndexStream.map(
-        (index) => tracklist.elementAtOrNull(index ?? 0),
+        (index) {
+          if (index != null) {
+            return _playlist.sequence[index].tag as Track;
+          }
+          return null;
+        },
       );
 
   @override
@@ -172,8 +202,12 @@ class AudioPlayer implements IAudioPlayer {
       });
 
   @override
-  Stream<bool> get shuffle$ => Stream.value(_shuffle);
+  Stream<bool> get shuffle$ => _player.shuffleModeEnabledStream;
 
   @override
-  Stream<List<Track>> get tracklist$ => Stream.value(_tracklist);
+  Stream<List<Track>> get tracklist$ {
+    return _player.sequenceStream.map((sequence) {
+      return sequence?.map((source) => source.tag as Track).toList() ?? [];
+    });
+  }
 }

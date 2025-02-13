@@ -26,6 +26,9 @@ abstract class IAudioPlayer {
   /// Must call when disposing the player
   void dispose();
 
+  /// Add a new track to the tracklist
+  Future<void> addTrack(Track newSong);
+
   /// Load a new track
   Future<void> setTrack(Track newSong);
 
@@ -40,6 +43,9 @@ abstract class IAudioPlayer {
 
   /// Go back to the previous track
   Future<void> previous();
+
+  /// The current track
+  Track? get currentTrack;
 
   /// Shuffle the tracklist
   bool get shuffle;

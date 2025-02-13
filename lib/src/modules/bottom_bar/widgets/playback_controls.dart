@@ -11,31 +11,11 @@ class PlaybackControls extends StatefulWidget {
   /// {@macro playback_controls}
   const PlaybackControls({
     required this.player,
-    required this.onNext,
-    required this.onPrevious,
-    required this.duration,
-    required this.position,
-    required this.onSeek,
     super.key,
   });
 
   /// The audio player
   final IAudioPlayer player;
-
-  /// Called when the next button is pressed
-  final FutureOr<void> Function() onNext;
-
-  /// Called when the previous button is pressed
-  final FutureOr<void> Function() onPrevious;
-
-  /// The total duration of the current track
-  final Duration duration;
-
-  /// The current position of the track
-  final Duration position;
-
-  /// Called when the user seeks to a new position
-  final FutureOr<void> Function(Duration duration) onSeek;
 
   @override
   State<PlaybackControls> createState() => _PlaybackControlsState();
@@ -103,7 +83,9 @@ class _PlaybackControlsState extends State<PlaybackControls>
                   color: Colors.white,
                   size: 24,
                 ),
-                onPressed: widget.onPrevious,
+                onPressed: () async {
+                  await widget.player.previous();
+                },
                 size: 24,
               ),
               _ControlButton(
@@ -126,7 +108,9 @@ class _PlaybackControlsState extends State<PlaybackControls>
                   color: Colors.white,
                   size: 24,
                 ),
-                onPressed: widget.onNext,
+                onPressed: () async {
+                  await widget.player.next();
+                },
                 size: 24,
               ),
               StreamBuilder(
@@ -152,9 +136,10 @@ class _PlaybackControlsState extends State<PlaybackControls>
             ],
           ),
           ProgressSlider(
-            duration: widget.duration,
-            position: widget.position,
-            onSeek: widget.onSeek,
+            player: widget.player,
+            onSeek: (position) async {
+              await widget.player.setCurrentTime(position);
+            },
           ),
         ],
       ),

@@ -37,4 +37,13 @@ class Track extends Equatable {
 
   @override
   List<Object?> get props => [name, path, duration, genre, album, artist];
+
+  /// An empty track
+  static Track empty = Track(
+    name: 'Select a track',
+    album: Album.empty,
+    artist: Artist.empty,
+    duration: Duration.zero,
+    path: '',
+  );
 }
