@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:interactive_slider/interactive_slider.dart';
 
@@ -20,26 +22,42 @@ class ProgressSlider extends StatefulWidget {
   final Duration position;
 
   /// Callback when user seeks to a new position
-  final void Function(Duration position) onSeek;
+  final FutureOr<void> Function(Duration position) onSeek;
 
   @override
   State<ProgressSlider> createState() => _ProgressSliderState();
 }
 
 class _ProgressSliderState extends State<ProgressSlider> {
+  late final InteractiveSliderController _controller;
+  bool _isHovering = false;
+  Duration? hoverPosition;
+
   String _formatDuration(Duration duration) {
     final minutes = duration.inMinutes;
     final seconds = (duration.inSeconds % 60).toString().padLeft(2, '0');
     return '$minutes:$seconds';
   }
 
-  Duration? hoverPosition;
+  @override
+  void initState() {
+    super.initState();
+    _controller = InteractiveSliderController(
+      widget.position.inMilliseconds / widget.duration.inMilliseconds,
+    );
+  }
+
+  @override
+  void didUpdateWidget(covariant ProgressSlider oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (hoverPosition == null && oldWidget.position != widget.position) {
+      _controller.value =
+          widget.position.inMilliseconds / widget.duration.inMilliseconds;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final progress =
-        widget.position.inMilliseconds / widget.duration.inMilliseconds;
-
     return InteractiveSlider(
       padding: EdgeInsets.zero,
       startIcon: Text(
@@ -50,18 +68,21 @@ class _ProgressSliderState extends State<ProgressSlider> {
         _formatDuration(widget.duration),
         style: const TextStyle(color: Colors.white60, fontSize: 12),
       ),
-      centerIcon: hoverPosition == null
-          ? null
-          : Text(
+      centerIcon: _isHovering
+          ? Text(
               _formatDuration(hoverPosition ?? widget.position),
               style: const TextStyle(color: Colors.white, fontSize: 12),
-            ),
-      initialProgress: progress.clamp(0, 1),
-      onProgressUpdated: (value) {
+            )
+          : null,
+      controller: _controller,
+      onProgressUpdated: (value) async {
+        setState(() {
+          _isHovering = false;
+        });
         final newPosition = Duration(
           milliseconds: (value * widget.duration.inMilliseconds).round(),
         );
-        widget.onSeek(newPosition);
+        await widget.onSeek(newPosition);
         setState(() {
           hoverPosition = null;
         });
@@ -71,14 +92,17 @@ class _ProgressSliderState extends State<ProgressSlider> {
           milliseconds: (value * widget.duration.inMilliseconds).round(),
         );
         setState(() {
+          _isHovering = true;
           hoverPosition = newPosition;
         });
       },
       onChanged: (value) {
+        if (!_isHovering) return;
+        final newDuration = Duration(
+          milliseconds: (value * widget.duration.inMilliseconds).round(),
+        );
         setState(() {
-          hoverPosition = Duration(
-            milliseconds: (value * widget.duration.inMilliseconds).round(),
-          );
+          hoverPosition = newDuration;
         });
       },
     );

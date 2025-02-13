@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:hitbeat/src/modules/bottom_bar/widgets/album_cover.dart';
@@ -25,7 +27,10 @@ class BottomBar extends StatefulWidget {
 
 class _BottomBarState extends State<BottomBar> {
   final IAudioPlayer _player = Modular.get<IAudioPlayer>();
-  final Duration _position = Duration.zero;
+  late final StreamSubscription<Track> _trackSubscription;
+  late final StreamSubscription<Duration> _positionSubscription;
+  Track? _currentTrack;
+  Duration _position = Duration.zero;
 
   /// The track that is currently playing
   static const Track _track = Track(
@@ -56,12 +61,26 @@ class _BottomBarState extends State<BottomBar> {
     if (_player.tracklist.isEmpty) {
       _player.setTrack(_track);
     }
+
+    _trackSubscription = _player.currentTrack$.listen((track) {
+      setState(() => _currentTrack = track);
+    });
+
+    _positionSubscription = _player.currentTime$.listen((position) {
+      setState(() => _position = position);
+    });
+  }
+
+  @override
+  void dispose() {
+    _trackSubscription.cancel();
+    _positionSubscription.cancel();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final currentTrack =
-        _player.tracklist.isEmpty ? _track : _player.tracklist.first;
+    final currentTrack = _currentTrack ?? _track;
 
     return Container(
       margin: const EdgeInsets.only(
@@ -99,35 +118,36 @@ class _BottomBarState extends State<BottomBar> {
                 flex: 60,
                 child: PlaybackControls(
                   isPlaying: _player.isPlaying,
-                  onPlayPause: () => setState(() {
-                    _player.isPlaying = !_player.isPlaying;
-                  }),
-                  onNext: () => setState(_player.next),
-                  onPrevious: () => setState(_player.previous),
-                  onRepeat: () {
-                    setState(() {
-                      _player.repeat = _player.repeat.next;
-                    });
+                  onPlayPause: () {
+                    _player.setIsPlaying(isPlaying: !_player.isPlaying);
                   },
-                  onShuffle: () {
-                    setState(() {
-                      _player.shuffle = !_player.shuffle;
-                    });
+                  onNext: _player.next,
+                  onPrevious: _player.previous,
+                  onRepeat: () async {
+                    await _player.setRepeat(_player.repeat.next);
+                  },
+                  onShuffle: () async {
+                    await _player.setShuffle(shuffle: !_player.shuffle);
                   },
                   duration: currentTrack.duration,
-                  position: _player.currentTime,
-                  onSeek: (position) => setState(() {
-                    _player.currentTime = position;
-                  }),
+                  position: _position,
+                  onSeek: (position) async {
+                    await _player.setCurrentTime(position);
+                  },
                 ),
               ),
               Flexible(
                 flex: 20,
-                child: VolumeControl(
-                  volume: _player.volume,
-                  onVolumeChanged: (volume) => setState(() {
-                    _player.volume = volume;
-                  }),
+                child: StreamBuilder(
+                  stream: _player.volume$,
+                  builder: (context, snapshot) {
+                    return VolumeControl(
+                      volume: snapshot.data!,
+                      onVolumeChanged: (volume) async {
+                        await _player.setVolume(volume);
+                      },
+                    );
+                  },
                 ),
               ),
             ],

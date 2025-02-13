@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:interactive_slider/interactive_slider.dart';
 
@@ -16,7 +18,7 @@ class VolumeControl extends StatefulWidget {
   final double volume;
 
   /// Callback when volume changes
-  final void Function(double volume) onVolumeChanged;
+  final FutureOr<void> Function(double volume) onVolumeChanged;
 
   @override
   State<VolumeControl> createState() => _VolumeControlState();
@@ -55,11 +57,11 @@ class _VolumeControlState extends State<VolumeControl> {
               hoverVolume = value;
             });
           },
-          onChanged: (value) {
-            widget.onVolumeChanged(value);
+          onChanged: (value) async {
             setState(() {
               hoverVolume = value;
             });
+            await widget.onVolumeChanged(value);
           },
         ),
       ],

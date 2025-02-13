@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:hitbeat/src/modules/player/enums/repeat.dart';
 import 'package:hitbeat/src/modules/player/models/track.dart';
 
@@ -25,7 +27,7 @@ abstract class IAudioPlayer {
   void dispose();
 
   /// Load a new track
-  void setTrack(Track newSong);
+  Future<void> setTrack(Track newSong);
 
   /// Clear the tracklist
   void clearTracklist();
@@ -34,32 +36,68 @@ abstract class IAudioPlayer {
   void concatTracks(List<Track> songs);
 
   /// Skip to the next track
-  void next();
+  Future<void> next();
 
   /// Go back to the previous track
-  void previous();
+  Future<void> previous();
 
   /// Shuffle the tracklist
   bool get shuffle;
-  set shuffle(bool shuffle);
+
+  /// Set the shuffle mode
+  FutureOr<void> setShuffle({required bool shuffle});
 
   /// Repeat mode
   Repeat get repeat;
-  set repeat(Repeat repeat);
+
+  /// Set the repeat mode
+  Future<void> setRepeat(Repeat repeat);
 
   /// If the player is currently playing
   bool get isPlaying;
-  set isPlaying(bool isPlaying);
+
+  /// Set the player to be playing
+  Future<void> setIsPlaying({required bool isPlaying});
 
   /// The current volume of the player
   double get volume;
-  set volume(double volume);
+
+  /// Set the volume of the player
+  Future<void> setVolume(double volume);
 
   /// If the player is muted
   bool get muted;
-  set muted(bool isMuted);
+
+  /// Set the player to be muted
+  Future<void> setMuted({required bool isMuted});
 
   /// The current time of the player
   Duration get currentTime;
-  set currentTime(Duration currentTime);
+
+  /// Set the current time of the player
+  Future<void> setCurrentTime(Duration currentTime);
+
+  /// Stream of the current time of the player
+  Stream<Duration> get currentTime$;
+
+  /// Stream of the current track
+  Stream<Track> get currentTrack$;
+
+  /// Stream of the current volume
+  Stream<double> get volume$;
+
+  /// Stream of the current mute state
+  Stream<bool> get muted$;
+
+  /// Stream of the current playing state
+  Stream<bool> get isPlaying$;
+
+  /// Stream of the current repeat state
+  Stream<Repeat> get repeat$;
+
+  /// Stream of the current shuffle state
+  Stream<bool> get shuffle$;
+
+  /// Stream of the current tracklist
+  Stream<List<Track>> get tracklist$;
 }

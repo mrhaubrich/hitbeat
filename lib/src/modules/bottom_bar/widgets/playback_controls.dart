@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:hitbeat/src/modules/bottom_bar/widgets/progress_slider.dart';
 
@@ -25,19 +27,19 @@ class PlaybackControls extends StatefulWidget {
   final bool isPlaying;
 
   /// Called when the play/pause button is pressed
-  final VoidCallback onPlayPause;
+  final FutureOr<void> Function() onPlayPause;
 
   /// Called when the next button is pressed
-  final VoidCallback onNext;
+  final FutureOr<void> Function() onNext;
 
   /// Called when the previous button is pressed
-  final VoidCallback onPrevious;
+  final FutureOr<void> Function() onPrevious;
 
   /// Called when the repeat button is pressed
-  final VoidCallback onRepeat;
+  final FutureOr<void> Function() onRepeat;
 
   /// Called when the shuffle button is pressed
-  final VoidCallback onShuffle;
+  final FutureOr<void> Function() onShuffle;
 
   /// The total duration of the current track
   final Duration duration;
@@ -46,7 +48,7 @@ class PlaybackControls extends StatefulWidget {
   final Duration position;
 
   /// Called when the user seeks to a new position
-  final ValueChanged<Duration> onSeek;
+  final FutureOr<void> Function(Duration duration) onSeek;
 
   /// Whether repeat mode is enabled
   final bool isRepeatEnabled;
@@ -168,7 +170,7 @@ class _ControlButton extends StatelessWidget {
   });
 
   final Widget icon;
-  final VoidCallback onPressed;
+  final FutureOr<void> Function() onPressed;
   final double size;
 
   @override
@@ -184,7 +186,9 @@ class _ControlButton extends StatelessWidget {
       ),
       child: IconButton(
         icon: icon,
-        onPressed: onPressed,
+        onPressed: () async {
+          await onPressed();
+        },
       ),
     );
   }

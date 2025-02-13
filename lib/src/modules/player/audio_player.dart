@@ -3,7 +3,11 @@ import 'package:hitbeat/src/modules/player/interfaces/player.dart';
 import 'package:hitbeat/src/modules/player/models/track.dart';
 import 'package:just_audio/just_audio.dart' as just_audio;
 
+/// {@template audio_player}
+/// An audio player that plays audio files.
+/// {@endtemplate}
 class AudioPlayer implements IAudioPlayer {
+  /// {@macro audio_player}
   AudioPlayer() {
     _player = just_audio.AudioPlayer();
     _tracklist = [];
@@ -50,24 +54,24 @@ class AudioPlayer implements IAudioPlayer {
   }
 
   @override
-  void next() {
+  Future<void> next() async {
     if (_currentIndex < _tracklist.length - 1) {
       _currentIndex++;
-      setTrack(_tracklist[_currentIndex]);
+      await setTrack(_tracklist[_currentIndex]);
     } else if (_repeat == Repeat.all) {
       _currentIndex = 0;
-      setTrack(_tracklist[_currentIndex]);
+      await setTrack(_tracklist[_currentIndex]);
     }
   }
 
   @override
-  void previous() {
+  Future<void> previous() async {
     if (_currentIndex > 0) {
       _currentIndex--;
-      setTrack(_tracklist[_currentIndex]);
+      await setTrack(_tracklist[_currentIndex]);
     } else if (_repeat == Repeat.all) {
       _currentIndex = _tracklist.length - 1;
-      setTrack(_tracklist[_currentIndex]);
+      await setTrack(_tracklist[_currentIndex]);
     }
   }
 
@@ -75,7 +79,7 @@ class AudioPlayer implements IAudioPlayer {
   bool get shuffle => _shuffle;
 
   @override
-  set shuffle(bool shuffle) {
+  void setShuffle({required bool shuffle}) {
     _shuffle = shuffle;
     if (shuffle) {
       _tracklist.shuffle();
@@ -86,15 +90,15 @@ class AudioPlayer implements IAudioPlayer {
   Repeat get repeat => _repeat;
 
   @override
-  set repeat(Repeat repeat) {
+  Future<void> setRepeat(Repeat repeat) {
     _repeat = repeat;
     switch (repeat) {
       case Repeat.none:
-        _player.setLoopMode(just_audio.LoopMode.off);
+        return _player.setLoopMode(just_audio.LoopMode.off);
       case Repeat.one:
-        _player.setLoopMode(just_audio.LoopMode.one);
+        return _player.setLoopMode(just_audio.LoopMode.one);
       case Repeat.all:
-        _player.setLoopMode(just_audio.LoopMode.all);
+        return _player.setLoopMode(just_audio.LoopMode.all);
     }
   }
 
@@ -102,11 +106,11 @@ class AudioPlayer implements IAudioPlayer {
   bool get isPlaying => _player.playing;
 
   @override
-  set isPlaying(bool isPlaying) {
+  Future<void> setIsPlaying({required bool isPlaying}) {
     if (isPlaying) {
-      _player.play();
+      return _player.play();
     } else {
-      _player.pause();
+      return _player.pause();
     }
   }
 
@@ -114,19 +118,19 @@ class AudioPlayer implements IAudioPlayer {
   double get volume => _player.volume;
 
   @override
-  set volume(double volume) {
-    _player.setVolume(volume);
+  Future<void> setVolume(double volume) {
+    return _player.setVolume(volume);
   }
 
   @override
   bool get muted => _player.volume == 0;
 
   @override
-  set muted(bool isMuted) {
+  Future<void> setMuted({required bool isMuted}) {
     if (isMuted) {
-      _player.setVolume(0);
+      return _player.setVolume(0);
     } else {
-      _player.setVolume(1);
+      return _player.setVolume(1);
     }
   }
 
@@ -134,7 +138,41 @@ class AudioPlayer implements IAudioPlayer {
   Duration get currentTime => _player.position;
 
   @override
-  set currentTime(Duration currentTime) {
-    _player.seek(currentTime);
+  Future<void> setCurrentTime(Duration currentTime) {
+    return _player.seek(currentTime);
   }
+
+  @override
+  Stream<Duration> get currentTime$ => _player.positionStream;
+
+  @override
+  Stream<Track> get currentTrack$ =>
+      _player.currentIndexStream.map((index) => _tracklist[index ?? 0]);
+
+  @override
+  Stream<double> get volume$ => _player.volumeStream;
+
+  @override
+  Stream<bool> get muted$ => _player.volumeStream.map((vol) => vol == 0);
+
+  @override
+  Stream<bool> get isPlaying$ => _player.playingStream;
+
+  @override
+  Stream<Repeat> get repeat$ => _player.loopModeStream.map((mode) {
+        switch (mode) {
+          case just_audio.LoopMode.off:
+            return Repeat.none;
+          case just_audio.LoopMode.one:
+            return Repeat.one;
+          case just_audio.LoopMode.all:
+            return Repeat.all;
+        }
+      });
+
+  @override
+  Stream<bool> get shuffle$ => Stream.value(_shuffle);
+
+  @override
+  Stream<List<Track>> get tracklist$ => Stream.value(_tracklist);
 }
