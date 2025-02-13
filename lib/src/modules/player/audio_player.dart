@@ -33,7 +33,7 @@ class AudioPlayer implements IAudioPlayer {
   @override
   Future<void> setTrack(Track newSong) async {
     await _player.setAudioSource(
-      just_audio.AudioSource.file(newSong.path),
+      just_audio.AudioSource.uri(Uri.parse(newSong.path)),
     );
     _tracklist
       ..clear()
@@ -146,8 +146,9 @@ class AudioPlayer implements IAudioPlayer {
   Stream<Duration> get currentTime$ => _player.positionStream;
 
   @override
-  Stream<Track?> get currentTrack$ =>
-      _player.currentIndexStream.map((index) => _tracklist[index ?? 0]);
+  Stream<Track?> get currentTrack$ => _player.currentIndexStream.map(
+        (index) => tracklist.elementAtOrNull(index ?? 0),
+      );
 
   @override
   Stream<double> get volume$ => _player.volumeStream;

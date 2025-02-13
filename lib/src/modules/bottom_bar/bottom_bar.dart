@@ -35,8 +35,7 @@ class _BottomBarState extends State<BottomBar> {
   /// The track that is currently playing
   static const Track _track = Track(
     name: 'Circles',
-    path:
-        '/home/marhaubrich/Music/Post Malone - Hollywoods Bleeding [FlexyOkay.com]/Post_Malone_-_Circles_FlexyOkay.com.mp3',
+    path: 'asset:///assets/songs/Post_Malone_-_Circles.mp3',
     album: Album(
       name: "Hollywood's Bleeding",
       cover:
