@@ -9,9 +9,9 @@ import 'package:rxdart/rxdart.dart';
 /// {@template audio_player}
 /// An audio player that plays audio files.
 /// {@endtemplate}
-class AudioPlayer implements IAudioPlayer {
+class AudioPlayerJustAudio implements IAudioPlayer {
   /// {@macro audio_player}
-  AudioPlayer() {
+  AudioPlayerJustAudio() {
     _player = just_audio.AudioPlayer()..setVolume(1);
     _playlist = just_audio.ConcatenatingAudioSource(children: []);
     _shuffle = false;
