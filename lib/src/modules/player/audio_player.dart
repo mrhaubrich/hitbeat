@@ -14,7 +14,6 @@ class AudioPlayerJustAudio implements IAudioPlayer {
   AudioPlayerJustAudio() {
     _player = just_audio.AudioPlayer()..setVolume(1);
     _playlist = just_audio.ConcatenatingAudioSource(children: []);
-    _shuffle = false;
     _repeat = Repeat.none;
     _trackController = BehaviorSubject<Track?>();
     _timeController = BehaviorSubject<Duration>();
@@ -36,7 +35,6 @@ class AudioPlayerJustAudio implements IAudioPlayer {
   late final just_audio.ConcatenatingAudioSource _playlist;
   late final BehaviorSubject<Track?> _trackController;
   late final BehaviorSubject<Duration> _timeController;
-  late bool _shuffle;
   late Repeat _repeat;
 
   Future<void> _initializePlayer() async {
@@ -57,6 +55,7 @@ class AudioPlayerJustAudio implements IAudioPlayer {
 
   @override
   Future<void> addTrack(Track newSong) {
+    _trackController.add(newSong);
     return _playlist.add(
       just_audio.AudioSource.uri(
         Uri.parse(newSong.path),
@@ -67,6 +66,7 @@ class AudioPlayerJustAudio implements IAudioPlayer {
 
   @override
   Future<void> setTrack(Track newSong) async {
+    _trackController.add(newSong);
     await _playlist.clear();
     await _playlist.add(
       just_audio.AudioSource.uri(
@@ -85,6 +85,9 @@ class AudioPlayerJustAudio implements IAudioPlayer {
 
   @override
   Future<void> concatTracks(List<Track> songs) {
+    if (_playlist.sequence.isEmpty) {
+      _trackController.add(songs.firstOrNull);
+    }
     return _playlist.addAll(
       songs
           .map(
@@ -112,11 +115,10 @@ class AudioPlayerJustAudio implements IAudioPlayer {
   }
 
   @override
-  bool get shuffle => _shuffle;
+  bool get shuffle => _player.shuffleModeEnabled;
 
   @override
   void setShuffle({required bool shuffle}) {
-    _shuffle = shuffle;
     _player.setShuffleModeEnabled(shuffle);
   }
 
@@ -124,7 +126,7 @@ class AudioPlayerJustAudio implements IAudioPlayer {
   Track? get currentTrack {
     final index = _player.currentIndex;
     if (index != null) {
-      return _playlist.sequence[index].tag as Track;
+      return _playlist.sequence.elementAtOrNull(index)?.tag as Track?;
     }
     return null;
   }

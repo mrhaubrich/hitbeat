@@ -52,7 +52,8 @@ class _ProgressSliderState extends State<ProgressSlider> {
     _positionSubscription = widget.player.currentTime$.listen((event) {
       if (hoverPosition == null) {
         _controller.value = event.inMilliseconds /
-            widget.player.currentTrack!.duration.inMilliseconds;
+            (widget.player.currentTrack?.duration ?? Duration.zero)
+                .inMilliseconds;
       }
     });
   }

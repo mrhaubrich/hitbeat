@@ -22,7 +22,9 @@ class MetadataExtractor implements IMetadataExtractor {
 
   AudioMetadata _readMetadata(String path) {
     final file = File(path);
-    final metadata = readMetadata(file, getImage: true);
+    final metadata = readMetadata(file, getImage: true)
+      ..title ??= file.path.split('/').last;
+
     return metadata;
   }
 
@@ -31,7 +33,7 @@ class MetadataExtractor implements IMetadataExtractor {
       (element) => element.pictureType == PictureType.coverFront,
     );
 
-    return coverFront?.bytes ?? _metadata!.pictures.first.bytes;
+    return coverFront?.bytes ?? _metadata!.pictures.firstOrNull?.bytes;
   }
 
   @override

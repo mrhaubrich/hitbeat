@@ -46,4 +46,24 @@ class Track extends Equatable {
     duration: Duration.zero,
     path: '',
   );
+
+  /// Creates a copy of the [Track] with the given fields replaced by
+  /// the new values.
+  Track copyWith({
+    String? name,
+    String? path,
+    Album? album,
+    Artist? artist,
+    Duration? duration,
+    List<Genre>? genres,
+  }) {
+    return Track(
+      name: name ?? this.name,
+      path: path ?? this.path,
+      album: album ?? this.album,
+      artist: artist ?? this.artist,
+      duration: duration ?? this.duration,
+      genres: genres ?? this.genres,
+    );
+  }
 }

@@ -1,4 +1,7 @@
+import 'dart:convert' show json;
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:hitbeat/src/modules/bottom_bar/widgets/album_cover.dart';
 import 'package:hitbeat/src/modules/bottom_bar/widgets/playback_controls.dart';
@@ -31,26 +34,38 @@ class _BottomBarState extends State<BottomBar> {
   final IMetadataExtractor _metadataExtractor =
       Modular.get<IMetadataExtractor>();
 
-  static const _trackAssetPaths = [
-    'asset:///assets/songs/Allergic.mp3',
-    'asset:///assets/songs/Post_Malone_-_Circles.mp3',
-  ];
+  Future<List<String>> getAssetPaths(String directory) async {
+    final manifestContent = await rootBundle.loadString('AssetManifest.json');
+    final manifestMap = json.decode(manifestContent) as Map<String, dynamic>;
+    final assetPaths = manifestMap.keys
+        .where((String key) => key.startsWith(directory))
+        .toList();
+    return assetPaths;
+  }
 
-  late final List<Track> _tracks;
-
-  List<String> get _trackPaths {
-    return _trackAssetPaths.map((e) => e.replaceAll('asset:///', '')).toList();
+  Future<List<String>> get _trackPaths async {
+    return getAssetPaths('assets/songs/');
   }
 
   @override
   void initState() {
     super.initState();
-    _tracks = _metadataExtractor.extractTracks(_trackPaths);
     _initializeTracks();
   }
 
-  Future<void> _initializeTracks() async {
-    _player.concatTracks(_tracks);
+  Future<List<Track>> _initializeTracks() async {
+    final paths = await _trackPaths;
+    final tracks = _metadataExtractor.extractTracks(paths);
+    // for (final track in tracks) {
+    //   track.path = 'asset:///${track.path}';
+    // }
+    final newTracks = tracks.map((track) {
+      return track.copyWith(
+        path: 'asset:///${track.path}',
+      );
+    }).toList();
+    _player.concatTracks(newTracks);
+    return newTracks;
   }
 
   @override
