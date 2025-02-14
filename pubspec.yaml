@@ -40,6 +40,10 @@ dependencies:
   collection: ^1.19.1
   rxdart: ^0.28.0
   audio_metadata_reader: ^1.1.0
+  drift: ^2.25.1
+  sqlite3_flutter_libs: ^0.5.30
+  path_provider: ^2.1.5
+  path: ^1.9.1
 
 dev_dependencies:
   flutter_test:
@@ -48,6 +52,8 @@ dev_dependencies:
   # ignore: sort_pub_dependencies
   flutter_lints: ^5.0.0
   very_good_analysis: ^7.0.0
+  drift_dev: ^2.25.2
+  build_runner: ^2.4.8
 
 flutter:
   uses-material-design: true
