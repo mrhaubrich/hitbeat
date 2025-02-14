@@ -4,9 +4,8 @@ import 'package:hitbeat/src/modules/bottom_bar/widgets/album_cover.dart';
 import 'package:hitbeat/src/modules/bottom_bar/widgets/playback_controls.dart';
 import 'package:hitbeat/src/modules/bottom_bar/widgets/track_info.dart';
 import 'package:hitbeat/src/modules/bottom_bar/widgets/volume_control.dart';
+import 'package:hitbeat/src/modules/player/interfaces/metadata_extractor.dart';
 import 'package:hitbeat/src/modules/player/interfaces/player.dart';
-import 'package:hitbeat/src/modules/player/models/album.dart';
-import 'package:hitbeat/src/modules/player/models/artist.dart';
 import 'package:hitbeat/src/modules/player/models/track.dart';
 
 /// The height of the bottom bar.
@@ -29,43 +28,24 @@ class BottomBar extends StatefulWidget {
 
 class _BottomBarState extends State<BottomBar> {
   final IAudioPlayer _player = Modular.get<IAudioPlayer>();
+  final IMetadataExtractor _metadataExtractor =
+      Modular.get<IMetadataExtractor>();
 
-  static const _post = Artist(
-    name: 'Post Malone',
-    image:
-        'https://cdna.artstation.com/p/assets/images/images/028/352/344/large/sharjeel-khan-post-malone-hollywood-bleeding-cover-art-by-me3.jpg?1594221623',
-    albums: [],
-  );
-
-  static const _hollywoodsBleeding = Album(
-    name: "Hollywood's Bleeding",
-    cover:
-        'https://cdna.artstation.com/p/assets/images/images/028/352/344/large/sharjeel-khan-post-malone-hollywood-bleeding-cover-art-by-me3.jpg?1594221623',
-    tracks: [],
-    artist: _post,
-  );
-
-  /// The track that is currently playing
-  static const _tracks = [
-    Track(
-      name: 'Allergic',
-      path: 'asset:///assets/songs/Allergic.mp3',
-      album: _hollywoodsBleeding,
-      artist: _post,
-      duration: Duration(minutes: 2, seconds: 37),
-    ),
-    Track(
-      name: 'Circles',
-      path: 'asset:///assets/songs/Post_Malone_-_Circles.mp3',
-      album: _hollywoodsBleeding,
-      artist: _post,
-      duration: Duration(minutes: 3, seconds: 36),
-    ),
+  static const _trackAssetPaths = [
+    'asset:///assets/songs/Allergic.mp3',
+    'asset:///assets/songs/Post_Malone_-_Circles.mp3',
   ];
+
+  late final List<Track> _tracks;
+
+  List<String> get _trackPaths {
+    return _trackAssetPaths.map((e) => e.replaceAll('asset:///', '')).toList();
+  }
 
   @override
   void initState() {
     super.initState();
+    _tracks = _metadataExtractor.extractTracks(_trackPaths);
     _initializeTracks();
   }
 
@@ -105,8 +85,19 @@ class _BottomBarState extends State<BottomBar> {
                     return Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        AlbumCover.network(
-                          url: snapshot.data?.album.cover ?? kNoAlbumCover,
+                        AnimatedCrossFade(
+                          duration: const Duration(milliseconds: 300),
+                          firstChild: const AlbumCover.asset(
+                            path: kNoAlbumCover,
+                          ),
+                          secondChild: snapshot.data?.album.cover != null
+                              ? AlbumCover.memory(
+                                  bytes: snapshot.data!.album.cover!,
+                                )
+                              : const SizedBox(),
+                          crossFadeState: snapshot.data?.album.cover == null
+                              ? CrossFadeState.showFirst
+                              : CrossFadeState.showSecond,
                         ),
                         Expanded(
                           child: TrackInfo(

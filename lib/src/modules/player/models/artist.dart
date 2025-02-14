@@ -1,3 +1,5 @@
+import 'dart:typed_data' show Uint8List;
+
 import 'package:equatable/equatable.dart';
 import 'package:hitbeat/src/modules/player/models/album.dart';
 
@@ -8,15 +10,15 @@ class Artist extends Equatable {
   /// {@macro artist}
   const Artist({
     required this.name,
-    required this.image,
     required this.albums,
+    this.image,
   });
 
   /// The name of the artist
   final String name;
 
   /// The image of the artist
-  final String image;
+  final Uint8List? image;
 
   /// The albums of the artist
   final List<Album> albums;
@@ -27,7 +29,6 @@ class Artist extends Equatable {
   /// An empty artist
   static Artist empty = const Artist(
     name: 'Select an artist',
-    image: '',
     albums: [],
   );
 }

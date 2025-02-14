@@ -14,7 +14,7 @@ class Track extends Equatable {
     required this.album,
     required this.artist,
     required this.duration,
-    this.genre,
+    this.genres = const [],
   });
 
   /// The name of the track
@@ -27,7 +27,7 @@ class Track extends Equatable {
   final Duration duration;
 
   /// The genre of the track
-  final Genre? genre;
+  final List<Genre> genres;
 
   /// The Album of the track
   final Album album;
@@ -36,7 +36,7 @@ class Track extends Equatable {
   final Artist artist;
 
   @override
-  List<Object?> get props => [name, path, duration, genre, album, artist];
+  List<Object?> get props => [name, path, duration, genres, album, artist];
 
   /// An empty track
   static Track empty = Track(
