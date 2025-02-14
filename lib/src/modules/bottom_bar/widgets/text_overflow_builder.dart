@@ -25,6 +25,7 @@ class TextOverflowBuilder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
+      key: ValueKey(text),
       builder: (context, constraints) {
         return _MemoizedTextOverflow(
           text: text,
