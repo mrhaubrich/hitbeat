@@ -29,6 +29,9 @@ abstract class IAudioPlayer {
   /// Play a track
   Future<void> play(Track track, {List<Track>? tracklist});
 
+  /// Pause the player
+  Future<void> pause();
+
   /// Add a new track to the tracklist
   Future<void> addTrack(Track newSong);
 

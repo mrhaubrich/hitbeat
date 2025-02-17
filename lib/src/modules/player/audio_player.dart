@@ -262,4 +262,9 @@ class AudioPlayerJustAudio implements IAudioPlayer {
       initialIndex: initialIndex == -1 ? null : initialIndex,
     );
   }
+
+  @override
+  Future<void> pause() {
+    return _player.pause();
+  }
 }
