@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:hitbeat/src/modules/player/enums/repeat.dart';
+import 'package:hitbeat/src/modules/player/enums/track_state.dart';
 import 'package:hitbeat/src/modules/player/interfaces/player.dart';
 import 'package:hitbeat/src/modules/player/models/track.dart';
 import 'package:just_audio/just_audio.dart' as just_audio;
@@ -17,6 +18,7 @@ class AudioPlayerJustAudio implements IAudioPlayer {
     _repeat = Repeat.none;
     _trackController = BehaviorSubject<Track?>();
     _timeController = BehaviorSubject<Duration>();
+    _trackStateController = BehaviorSubject<TrackState>();
     _initializePlayer();
 
     // Add listener for playback completion
@@ -27,6 +29,11 @@ class AudioPlayerJustAudio implements IAudioPlayer {
           _trackController.add(firstTrack);
           _timeController.add(Duration.zero);
         });
+        _trackStateController.add(TrackState.notPlaying);
+      } else if (state.playing) {
+        _trackStateController.add(TrackState.playing);
+      } else {
+        _trackStateController.add(TrackState.paused);
       }
     });
   }
@@ -35,6 +42,7 @@ class AudioPlayerJustAudio implements IAudioPlayer {
   late final just_audio.ConcatenatingAudioSource _playlist;
   late final BehaviorSubject<Track?> _trackController;
   late final BehaviorSubject<Duration> _timeController;
+  late final BehaviorSubject<TrackState> _trackStateController;
   late Repeat _repeat;
 
   Future<void> _initializePlayer() async {
@@ -51,6 +59,7 @@ class AudioPlayerJustAudio implements IAudioPlayer {
     await _player.dispose();
     await _trackController.close();
     await _timeController.close();
+    await _trackStateController.close();
   }
 
   @override
@@ -267,4 +276,7 @@ class AudioPlayerJustAudio implements IAudioPlayer {
   Future<void> pause() {
     return _player.pause();
   }
+
+  @override
+  Stream<TrackState> get trackState$ => _trackStateController.stream;
 }

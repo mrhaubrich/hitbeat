@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:hitbeat/src/modules/player/enums/repeat.dart';
+import 'package:hitbeat/src/modules/player/enums/track_state.dart';
 import 'package:hitbeat/src/modules/player/models/track.dart';
 
 // typedef TimeUpdateCallback = void Function();
@@ -112,4 +113,7 @@ abstract class IAudioPlayer {
 
   /// Stream of the current tracklist
   Stream<List<Track>> get tracklist$;
+
+  /// Stream of the current track state
+  Stream<TrackState> get trackState$;
 }

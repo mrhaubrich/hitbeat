@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hitbeat/src/modules/player/enums/track_state.dart';
 import 'package:hitbeat/src/modules/player/models/track.dart';
 
 /// {@template track_list_tile}
@@ -8,7 +9,7 @@ class TrackListTile extends StatelessWidget {
   /// {@macro track_list_tile}
   const TrackListTile({
     required this.track,
-    required this.isPlaying,
+    required this.trackState,
     required this.onTap,
     super.key,
   });
@@ -16,8 +17,8 @@ class TrackListTile extends StatelessWidget {
   /// The track
   final Track track;
 
-  /// Whether the track is playing
-  final bool isPlaying;
+  /// The state of the track
+  final TrackState trackState;
 
   /// The callback when the tile is tapped
   final VoidCallback onTap;
@@ -25,6 +26,8 @@ class TrackListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isSelected = trackState != TrackState.notPlaying;
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
@@ -50,25 +53,37 @@ class TrackListTile extends StatelessWidget {
         title: Text(
           track.name,
           style: TextStyle(
-            color: isPlaying ? Theme.of(context).primaryColor : null,
-            fontWeight: isPlaying ? FontWeight.bold : FontWeight.normal,
+            color: isSelected ? Theme.of(context).primaryColor : null,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
           ),
         ),
         subtitle: Text(
           track.artist.name,
           style: TextStyle(
-            color: isPlaying ? theme.primaryColor.withValues(alpha: 0.7) : null,
+            color:
+                isSelected ? theme.primaryColor.withValues(alpha: 0.7) : null,
           ),
         ),
         trailing: IconButton(
           icon: Icon(
-            isPlaying ? Icons.pause_circle_filled : Icons.play_circle_fill,
-            color: isPlaying ? Theme.of(context).primaryColor : null,
+            _getIconForState(trackState),
+            color: isSelected ? Theme.of(context).primaryColor : null,
             size: 32,
           ),
           onPressed: onTap,
         ),
       ),
     );
+  }
+
+  IconData _getIconForState(TrackState state) {
+    switch (state) {
+      case TrackState.playing:
+        return Icons.pause_circle_filled;
+      case TrackState.paused:
+        return Icons.play_circle_filled;
+      case TrackState.notPlaying:
+        return Icons.play_circle_outline;
+    }
   }
 }
