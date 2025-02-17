@@ -205,7 +205,8 @@ class _AddSongsPageState extends State<AddSongsPage> {
                     ),
                     const SizedBox(height: 24),
                     Text(
-                      'Drag and drop music files here\nor click to select files',
+                      'Drag and drop music files here\nor '
+                      'click to select files',
                       style: theme.textTheme.headlineSmall?.copyWith(
                         color: _isDragging
                             ? theme.colorScheme.primary

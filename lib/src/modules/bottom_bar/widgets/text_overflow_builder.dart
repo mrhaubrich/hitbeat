@@ -49,7 +49,9 @@ class _MemoizedTextOverflow extends StatefulWidget {
   final String text;
   final TextStyle? style;
   final double width;
-  final Widget Function(BuildContext, bool) builder;
+  // Ignoring this because it's a private class.
+  // ignore: avoid_positional_boolean_parameters
+  final Widget Function(BuildContext, bool isOverflowing) builder;
 
   @override
   State<_MemoizedTextOverflow> createState() => _MemoizedTextOverflowState();

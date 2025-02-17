@@ -6,7 +6,11 @@ import 'package:hitbeat/src/modules/player/enums/track_state.dart';
 import 'package:hitbeat/src/modules/player/interfaces/player.dart';
 import 'package:hitbeat/src/modules/player/models/track.dart';
 
+/// {@template track_page}
+/// A page to display and play tracks.
+/// {@endtemplate}
 class TrackPage extends StatefulWidget {
+  /// {@macro track_page}
   const TrackPage({super.key});
 
   @override
