@@ -26,6 +26,9 @@ abstract class IAudioPlayer {
   /// Must call when disposing the player
   void dispose();
 
+  /// Play a track
+  Future<void> play(Track track, {List<Track>? tracklist});
+
   /// Add a new track to the tracklist
   Future<void> addTrack(Track newSong);
 

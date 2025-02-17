@@ -232,4 +232,34 @@ class AudioPlayerJustAudio implements IAudioPlayer {
       return sequence?.map((source) => source.tag as Track).toList() ?? [];
     });
   }
+
+  @override
+  Future<void> play(Track track, {List<Track>? tracklist}) {
+    if (tracklist != null) {
+      _playlist
+        ..clear()
+        ..addAll(
+          tracklist
+              .map(
+                (song) => just_audio.AudioSource.uri(
+                  Uri.parse(song.path),
+                  tag: song,
+                ),
+              )
+              .toList(),
+        );
+    }
+    final initialIndex =
+        _playlist.sequence.indexWhere((source) => source.tag == track);
+
+    return _player.setAudioSource(
+      just_audio.ConcatenatingAudioSource(
+        children: _playlist.sequence,
+        shuffleOrder: _player.shuffleModeEnabled
+            ? just_audio.DefaultShuffleOrder()
+            : null,
+      ),
+      initialIndex: initialIndex == -1 ? null : initialIndex,
+    );
+  }
 }
