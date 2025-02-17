@@ -22,7 +22,7 @@ class AudioPlayerJustAudio implements IAudioPlayer {
     _initializePlayer();
 
     // Add listener for playback completion
-    _player.playerStateStream.listen((state) async {
+    _playerStateController = _player.playerStateStream.listen((state) async {
       if (state.processingState == just_audio.ProcessingState.completed) {
         final firstTrack = _playlist.sequence.firstOrNull?.tag as Track?;
         Future.delayed(const Duration(milliseconds: 500), () {
@@ -43,10 +43,12 @@ class AudioPlayerJustAudio implements IAudioPlayer {
   late final BehaviorSubject<Track?> _trackController;
   late final BehaviorSubject<Duration> _timeController;
   late final BehaviorSubject<TrackState> _trackStateController;
+  late final StreamSubscription<just_audio.PlayerState> _playerStateController;
   late Repeat _repeat;
 
   Future<void> _initializePlayer() async {
     await _player.setAudioSource(_playlist);
+    await _player.pause();
   }
 
   @override
@@ -56,6 +58,7 @@ class AudioPlayerJustAudio implements IAudioPlayer {
 
   @override
   Future<void> dispose() async {
+    await _playerStateController.cancel();
     await _player.dispose();
     await _trackController.close();
     await _timeController.close();
@@ -243,25 +246,26 @@ class AudioPlayerJustAudio implements IAudioPlayer {
   }
 
   @override
-  Future<void> play(Track track, {List<Track>? tracklist}) {
+  Future<void> play(Track track, {List<Track>? tracklist}) async {
     if (tracklist != null) {
-      _playlist
-        ..clear()
-        ..addAll(
-          tracklist
-              .map(
-                (song) => just_audio.AudioSource.uri(
-                  Uri.parse(song.path),
-                  tag: song,
-                ),
-              )
-              .toList(),
-        );
+      await _playlist.clear();
+      await _playlist.addAll(
+        tracklist
+            .map(
+              (song) => just_audio.AudioSource.uri(
+                Uri.parse(song.path),
+                tag: song,
+              ),
+            )
+            .toList(),
+      );
     }
     final initialIndex =
         _playlist.sequence.indexWhere((source) => source.tag == track);
 
-    return _player.setAudioSource(
+    _trackController.add(track); // Add this line to emit the track immediately
+
+    await _player.setAudioSource(
       just_audio.ConcatenatingAudioSource(
         children: _playlist.sequence,
         shuffleOrder: _player.shuffleModeEnabled
@@ -270,6 +274,7 @@ class AudioPlayerJustAudio implements IAudioPlayer {
       ),
       initialIndex: initialIndex == -1 ? null : initialIndex,
     );
+    await _player.play(); // Add this line to start playback immediately
   }
 
   @override
