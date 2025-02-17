@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -25,15 +26,52 @@ class _AddSongsPageState extends State<AddSongsPage> {
   final _trackRepository = Modular.get<TrackRepository>();
   bool _isDragging = false;
 
+  static const _supportedExtensions = ['.mp3', '.wav', '.flac', '.m4a'];
+
+  bool _isAudioFile(String path) {
+    final extension = path.toLowerCase();
+    return _supportedExtensions.any(extension.endsWith);
+  }
+
+  List<String> _getAudioFilesFromDirectory(String dirPath) {
+    final dir = Directory(dirPath);
+    final audioFiles = <String>[];
+
+    if (!dir.existsSync()) return audioFiles;
+
+    for (final entity in dir.listSync(recursive: true)) {
+      if (entity is File && _isAudioFile(entity.path)) {
+        audioFiles.add(entity.path);
+      }
+    }
+
+    return audioFiles;
+  }
+
   Future<void> _handleFileDrop() async {
     final result = await FilePicker.platform.pickFiles(
-      type: FileType.audio,
+      type: FileType.custom,
+      allowedExtensions:
+          _supportedExtensions.map((e) => e.substring(1)).toList(),
       allowMultiple: true,
+      dialogTitle: 'Select audio files',
     );
 
     if (result != null) {
-      final paths = result.files.map((file) => file.path!).toList();
-      final tracks = _metadataExtractor.extractTracks(paths);
+      final allPaths = <String>[];
+
+      for (final file in result.files) {
+        final path = file.path!;
+        if (FileSystemEntity.isDirectorySync(path)) {
+          allPaths.addAll(_getAudioFilesFromDirectory(path));
+        } else {
+          allPaths.add(path);
+        }
+      }
+
+      if (allPaths.isEmpty) return;
+
+      final tracks = _metadataExtractor.extractTracks(allPaths);
       await _handleTrackAdd(tracks);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -44,9 +82,22 @@ class _AddSongsPageState extends State<AddSongsPage> {
   }
 
   Future<void> _handleNativeFileDrop(List<Uri?> uris) async {
-    final paths =
-        uris.map((uri) => uri?.toFilePath()).whereType<String>().toList();
-    final tracks = _metadataExtractor.extractTracks(paths);
+    final allPaths = <String>[];
+
+    for (final uri in uris) {
+      if (uri == null) continue;
+      final path = uri.toFilePath();
+
+      if (FileSystemEntity.isDirectorySync(path)) {
+        allPaths.addAll(_getAudioFilesFromDirectory(path));
+      } else if (_isAudioFile(path)) {
+        allPaths.add(path);
+      }
+    }
+
+    if (allPaths.isEmpty) return;
+
+    final tracks = _metadataExtractor.extractTracks(allPaths);
     await _handleTrackAdd(tracks);
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -72,10 +123,6 @@ class _AddSongsPageState extends State<AddSongsPage> {
       ),
       child: DropRegion(
         formats: const [
-          Formats.mp3,
-          Formats.flac,
-          Formats.wav,
-          Formats.m4a,
           Formats.fileUri,
         ],
         onDropOver: (event) {
