@@ -35,7 +35,7 @@ class DashboardPage extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.add_circle_outline),
             tooltip: 'Add Songs',
-            onPressed: () => Modular.to.pushNamed('./add-songs'),
+            onPressed: () => Modular.to.navigate('add-songs'),
           ),
         ],
       ),
