@@ -63,8 +63,7 @@ class _TrackPageState extends State<TrackPage> {
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     itemCount: tracks.length,
                     itemBuilder: (context, index) {
-                      final track = tracks[index]
-                          .copyWith(path: 'asset:///${tracks[index].path}');
+                      final track = tracks[index];
 
                       final isCurrentTrack = currentTrack?.path == track.path;
                       final trackState = isCurrentTrack
@@ -82,13 +81,7 @@ class _TrackPageState extends State<TrackPage> {
                           } else {
                             _player.play(
                               track,
-                              tracklist: tracks
-                                  .map(
-                                    (e) => e.copyWith(
-                                      path: 'asset:///${e.path}',
-                                    ),
-                                  )
-                                  .toList(),
+                              tracklist: tracks,
                             );
                           }
                         },

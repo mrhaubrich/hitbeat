@@ -2,6 +2,7 @@ import 'dart:convert' show json;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_modular/flutter_modular.dart';
 import 'package:hitbeat/src/modules/home/widgets/example_card.dart';
 import 'package:hitbeat/src/modules/home/widgets/example_context_menu.dart';
 import 'package:hitbeat/src/modules/home/widgets/miolo.dart';
@@ -30,6 +31,13 @@ class DashboardPage extends StatelessWidget {
       appBar: AppBar(
         centerTitle: true,
         title: const Text('Dashboard'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add_circle_outline),
+            tooltip: 'Add Songs',
+            onPressed: () => Modular.to.pushNamed('./add-songs'),
+          ),
+        ],
       ),
       child: const SizedBox(
         width: double.infinity,

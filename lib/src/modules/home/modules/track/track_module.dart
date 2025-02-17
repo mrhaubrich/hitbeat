@@ -12,10 +12,12 @@ class TrackModule extends Module {
   ];
 
   @override
+  void exportedBinds(Injector i) {}
+
+  @override
   void binds(Injector i) {
-    i
-      ..addSingleton<TrackController>(TrackController.new)
-      ..addSingleton<TrackRepository>(TrackRepository.new);
+    i.addSingleton<TrackController>(TrackController.new);
+    i.addSingleton<TrackRepository>(TrackRepository.new);
   }
 
   @override

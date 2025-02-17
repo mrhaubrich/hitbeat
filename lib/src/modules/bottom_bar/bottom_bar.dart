@@ -1,13 +1,9 @@
-import 'dart:convert' show json;
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:hitbeat/src/modules/bottom_bar/widgets/album_cover.dart';
 import 'package:hitbeat/src/modules/bottom_bar/widgets/playback_controls.dart';
 import 'package:hitbeat/src/modules/bottom_bar/widgets/track_info.dart';
 import 'package:hitbeat/src/modules/bottom_bar/widgets/volume_control.dart';
-import 'package:hitbeat/src/modules/player/interfaces/metadata_extractor.dart';
 import 'package:hitbeat/src/modules/player/interfaces/player.dart';
 import 'package:hitbeat/src/modules/player/models/track.dart';
 
@@ -31,42 +27,6 @@ class BottomBar extends StatefulWidget {
 
 class _BottomBarState extends State<BottomBar> {
   final IAudioPlayer _player = Modular.get<IAudioPlayer>();
-  final IMetadataExtractor _metadataExtractor =
-      Modular.get<IMetadataExtractor>();
-
-  Future<List<String>> getAssetPaths(String directory) async {
-    final manifestContent = await rootBundle.loadString('AssetManifest.json');
-    final manifestMap = json.decode(manifestContent) as Map<String, dynamic>;
-    final assetPaths = manifestMap.keys
-        .where((String key) => key.startsWith(directory))
-        .toList();
-    return assetPaths;
-  }
-
-  Future<List<String>> get _trackPaths async {
-    return getAssetPaths('assets/songs/');
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _initializeTracks();
-  }
-
-  Future<List<Track>> _initializeTracks() async {
-    final paths = await _trackPaths;
-    final tracks = _metadataExtractor.extractTracks(paths);
-    // for (final track in tracks) {
-    //   track.path = 'asset:///${track.path}';
-    // }
-    final newTracks = tracks.map((track) {
-      return track.copyWith(
-        path: 'asset:///${track.path}',
-      );
-    }).toList();
-    _player.concatTracks(newTracks);
-    return newTracks;
-  }
 
   @override
   void dispose() {

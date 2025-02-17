@@ -102,4 +102,11 @@ class TrackRepository {
     // You'll need to implement the conversion logic here
     return tracks.map((t) => t.toEntity()).toList();
   }
+
+  /// Inserts multiple tracks into the database.
+  Future<void> insertTracks(List<Track> tracks) async {
+    for (final track in tracks) {
+      await insertTrack(track);
+    }
+  }
 }

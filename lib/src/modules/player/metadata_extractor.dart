@@ -91,7 +91,7 @@ class MetadataExtractor implements IMetadataExtractor {
       album: _extractAlbum(),
       artist: _extractArtist(),
       duration: _metadata!.duration!,
-      path: path,
+      path: 'file:///$path',
       genres: _extractGenres(),
     );
 
