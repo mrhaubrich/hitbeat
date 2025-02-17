@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hitbeat/src/modules/home/modules/track/widgets/animated_play_pause_button.dart';
 import 'package:hitbeat/src/modules/player/enums/track_state.dart';
 import 'package:hitbeat/src/modules/player/models/track.dart';
 
@@ -35,7 +36,7 @@ class TrackListTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
+            color: Colors.black.withAlpha(25),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -60,30 +61,16 @@ class TrackListTile extends StatelessWidget {
         subtitle: Text(
           track.artist.name,
           style: TextStyle(
-            color:
-                isSelected ? theme.primaryColor.withValues(alpha: 0.7) : null,
+            color: isSelected ? theme.primaryColor.withAlpha(179) : null,
           ),
         ),
-        trailing: IconButton(
-          icon: Icon(
-            _getIconForState(trackState),
-            color: isSelected ? Theme.of(context).primaryColor : null,
-            size: 32,
-          ),
+        trailing: AnimatedPlayPauseButton(
+          state: trackState,
           onPressed: onTap,
+          color: isSelected ? Theme.of(context).primaryColor : null,
+          filled: trackState != TrackState.notPlaying,
         ),
       ),
     );
-  }
-
-  IconData _getIconForState(TrackState state) {
-    switch (state) {
-      case TrackState.playing:
-        return Icons.pause_circle_filled;
-      case TrackState.paused:
-        return Icons.play_circle_filled;
-      case TrackState.notPlaying:
-        return Icons.play_circle_outline;
-    }
   }
 }
