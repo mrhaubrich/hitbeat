@@ -3,7 +3,11 @@ import 'package:hitbeat/src/data/models/db_artist.dart';
 import 'package:hitbeat/src/data/models/db_genre.dart';
 import 'package:hitbeat/src/modules/player/models/track.dart';
 
+/// {@template db_track}
+/// A track stored in the database.
+/// {@endtemplate}
 class DbTrack {
+  /// {@macro db_track}
   DbTrack({
     required this.id,
     required this.name,
@@ -14,6 +18,7 @@ class DbTrack {
     required this.artist,
   });
 
+  /// Creates a [DbTrack] from a map.
   factory DbTrack.fromMap(Map<String, dynamic> map) {
     return DbTrack(
       id: map['id'] as int,
@@ -26,6 +31,7 @@ class DbTrack {
     );
   }
 
+  /// Creates a [DbTrack] from a [Track].
   factory DbTrack.fromEntity(Track track) {
     return DbTrack(
       id: 0, // This should be set when inserting into the database
@@ -37,14 +43,29 @@ class DbTrack {
       artist: DbArtist.fromEntity(track.artist),
     );
   }
+
+  /// The unique identifier for the track.
   final int id;
+
+  /// The name of the track.
   final String name;
+
+  /// The path to the track file.
   final String path;
+
+  /// The duration of the track in milliseconds.
   final int durationInMillis;
+
+  /// The genres of the track.
   final List<DbGenre> genres;
+
+  /// The album the track belongs to.
   final DbAlbum album;
+
+  /// The artist of the track.
   final DbArtist artist;
 
+  /// Converts the [DbTrack] to a map.
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -56,6 +77,7 @@ class DbTrack {
     };
   }
 
+  /// Converts the [DbTrack] to a [Track].
   Track toEntity() {
     return Track(
       name: name,
