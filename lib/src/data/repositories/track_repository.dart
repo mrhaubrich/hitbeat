@@ -95,6 +95,7 @@ class TrackRepository {
     }
   }
 
+  /// Retrieves all tracks from the database.
   Future<List<Track>> getAllTracks() async {
     final tracks = await _database.getAllTracks();
     // Convert database tracks to domain tracks
