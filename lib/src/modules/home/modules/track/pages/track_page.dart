@@ -61,6 +61,11 @@ class _TrackPageState extends State<TrackPage> {
                 builder: (context, stateSnapshot) {
                   return ListView.builder(
                     padding: const EdgeInsets.symmetric(vertical: 16),
+                    prototypeItem: TrackListTile(
+                      track: Track.empty,
+                      trackState: TrackState.notPlaying,
+                      onTap: () {},
+                    ),
                     itemCount: tracks.length,
                     itemBuilder: (context, index) {
                       final track = tracks[index];
