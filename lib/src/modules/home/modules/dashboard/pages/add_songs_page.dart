@@ -4,7 +4,6 @@ import 'package:flutter_modular/flutter_modular.dart';
 import 'package:hitbeat/src/data/repositories/track_repository.dart';
 import 'package:hitbeat/src/modules/home/widgets/miolo.dart';
 import 'package:hitbeat/src/modules/player/interfaces/metadata_extractor.dart';
-import 'package:hitbeat/src/modules/player/interfaces/player.dart';
 import 'package:hitbeat/src/modules/player/models/track.dart';
 
 /// {@template add_songs_page}
@@ -19,7 +18,6 @@ class AddSongsPage extends StatefulWidget {
 }
 
 class _AddSongsPageState extends State<AddSongsPage> {
-  final _player = Modular.get<IAudioPlayer>();
   final _metadataExtractor = Modular.get<IMetadataExtractor>();
   final _trackRepository = Modular.get<TrackRepository>();
   bool _isDragging = false;
@@ -56,6 +54,7 @@ class _AddSongsPageState extends State<AddSongsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Miolo(
       appBar: AppBar(
         title: const Text('Add Songs'),
@@ -77,43 +76,75 @@ class _AddSongsPageState extends State<AddSongsPage> {
           _handleFileDrop();
         },
         builder: (context, candidateData, rejectedData) {
-          return GestureDetector(
-            onTap: _handleFileDrop,
-            child: Container(
+          return MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
               margin: const EdgeInsets.all(20),
               decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    theme.colorScheme.surface,
+                    theme.colorScheme.surface.withValues(alpha: 0.8),
+                  ],
+                ),
                 border: Border.all(
                   color: _isDragging
-                      ? Theme.of(context).primaryColor
-                      : Colors.grey,
-                  width: 2,
-                  // style: BorderStyle.solid,
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.outline.withValues(alpha: 0.5),
+                  width: _isDragging ? 3 : 2,
                 ),
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: [
+                  BoxShadow(
+                    color: _isDragging
+                        ? theme.colorScheme.primary.withValues(alpha: 0.3)
+                        : Colors.transparent,
+                    blurRadius: 8,
+                    spreadRadius: 2,
+                  ),
+                ],
               ),
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.cloud_upload,
-                      size: 80,
-                      color: _isDragging
-                          ? Theme.of(context).primaryColor
-                          : Colors.grey,
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(24),
+                  onTap: _handleFileDrop,
+                  child: Padding(
+                    padding: const EdgeInsets.all(40),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.cloud_upload_rounded,
+                          size: 80,
+                          color: _isDragging
+                              ? theme.colorScheme.primary
+                              : theme.colorScheme.outline,
+                        ),
+                        const SizedBox(height: 24),
+                        Text(
+                          'Drag and drop music files here\nor click to select files',
+                          style: theme.textTheme.headlineSmall?.copyWith(
+                            color: _isDragging
+                                ? theme.colorScheme.primary
+                                : theme.colorScheme.onSurface,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          'Supported formats: MP3, WAV, FLAC, M4A',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.colorScheme.outline,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 20),
-                    Text(
-                      'Drag and drop music files here\nor click to select files',
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: _isDragging
-                            ? Theme.of(context).primaryColor
-                            : Colors.grey,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ),
