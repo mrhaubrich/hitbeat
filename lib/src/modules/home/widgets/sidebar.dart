@@ -23,9 +23,9 @@ class Sidebar extends StatelessWidget {
       route: '/dashboard/',
     ),
     _SidebarItem(
-      icon: Icons.shopping_cart,
-      label: 'Shop',
-      route: '/shop/',
+      icon: Icons.queue_music,
+      label: 'Tracks',
+      route: '/tracks/',
     ),
     _SidebarItem(
       icon: Icons.icecream,
