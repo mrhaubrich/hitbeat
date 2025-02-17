@@ -2,14 +2,18 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 
+/// A service that handles file operations.
 class FileHandlerService {
+  /// The supported audio file extensions.
   static const supportedExtensions = ['.mp3', '.wav', '.flac', '.m4a'];
 
+  /// Checks if the given path is an audio file.
   bool isAudioFile(String path) {
     final extension = path.toLowerCase();
     return supportedExtensions.any(extension.endsWith);
   }
 
+  /// Gets all audio files from the given directory.
   List<String> getAudioFilesFromDirectory(String dirPath) {
     final dir = Directory(dirPath);
     final audioFiles = <String>[];
@@ -25,6 +29,7 @@ class FileHandlerService {
     return audioFiles;
   }
 
+  /// Picks audio files from the device.
   Future<List<String>> pickFiles() async {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
@@ -49,6 +54,7 @@ class FileHandlerService {
     return allPaths;
   }
 
+  /// Handles the given URIs.
   Future<List<String>> handleUris(List<Uri?> uris) async {
     final allPaths = <String>[];
 
