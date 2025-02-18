@@ -42,27 +42,50 @@ class SongEditorWidget extends StatelessWidget {
           child: ListView.builder(
             itemCount: songs.length,
             prototypeItem: Card(
+              key: const ValueKey('prototype'),
               margin: const EdgeInsets.all(8),
               child: Padding(
                 padding: const EdgeInsets.all(16),
-                child: Column(
+                child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Song ${-100}'),
-                    TextFormField(
-                      initialValue: 'song.name',
-                      decoration: const InputDecoration(labelText: 'Title'),
-                      onChanged: (_) {},
+                    Container(
+                      width: 120,
+                      height: 120,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Center(
+                        child: Icon(Icons.album, size: 48, color: Colors.grey),
+                      ),
                     ),
-                    TextFormField(
-                      initialValue: 'song.artist.name',
-                      decoration: const InputDecoration(labelText: 'Artist'),
-                      onChanged: (_) {},
-                    ),
-                    TextFormField(
-                      initialValue: 'song.album.name',
-                      decoration: const InputDecoration(labelText: 'Album'),
-                      onChanged: (_) {},
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('Song ${-100}'),
+                          TextFormField(
+                            initialValue: 'song.name',
+                            decoration:
+                                const InputDecoration(labelText: 'Title'),
+                            onChanged: (_) {},
+                          ),
+                          TextFormField(
+                            initialValue: 'song.artist.name',
+                            decoration:
+                                const InputDecoration(labelText: 'Artist'),
+                            onChanged: (_) {},
+                          ),
+                          TextFormField(
+                            initialValue: 'song.album.name',
+                            decoration:
+                                const InputDecoration(labelText: 'Album'),
+                            onChanged: (_) {},
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -75,28 +98,63 @@ class SongEditorWidget extends StatelessWidget {
                 margin: const EdgeInsets.all(8),
                 child: Padding(
                   padding: const EdgeInsets.all(16),
-                  child: Column(
+                  child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Song ${index + 1}'),
-                      TextFormField(
-                        initialValue: song.name,
-                        decoration: const InputDecoration(labelText: 'Title'),
-                        onChanged: (value) =>
-                            songs[index] = song.copyWith(name: value),
-                      ),
-                      TextFormField(
-                        initialValue: song.artist.name,
-                        decoration: const InputDecoration(labelText: 'Artist'),
-                        onChanged: (value) => songs[index] = song.copyWith(
-                          artist: song.artist.copyWith(name: value),
+                      Container(
+                        width: 120,
+                        height: 120,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          image: song.album.cover != null
+                              ? DecorationImage(
+                                  image: MemoryImage(song.album.cover!),
+                                  fit: BoxFit.cover,
+                                )
+                              : null,
                         ),
+                        child: song.album.cover == null
+                            ? const Center(
+                                child: Icon(
+                                  Icons.album,
+                                  size: 48,
+                                  color: Colors.grey,
+                                ),
+                              )
+                            : null,
                       ),
-                      TextFormField(
-                        initialValue: song.album.name,
-                        decoration: const InputDecoration(labelText: 'Album'),
-                        onChanged: (value) => songs[index] = song.copyWith(
-                          album: song.album.copyWith(name: value),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Song ${index + 1}'),
+                            TextFormField(
+                              initialValue: song.name,
+                              decoration:
+                                  const InputDecoration(labelText: 'Title'),
+                              onChanged: (value) =>
+                                  songs[index] = song.copyWith(name: value),
+                            ),
+                            TextFormField(
+                              initialValue: song.artist.name,
+                              decoration:
+                                  const InputDecoration(labelText: 'Artist'),
+                              onChanged: (value) =>
+                                  songs[index] = song.copyWith(
+                                artist: song.artist.copyWith(name: value),
+                              ),
+                            ),
+                            TextFormField(
+                              initialValue: song.album.name,
+                              decoration:
+                                  const InputDecoration(labelText: 'Album'),
+                              onChanged: (value) =>
+                                  songs[index] = song.copyWith(
+                                album: song.album.copyWith(name: value),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
