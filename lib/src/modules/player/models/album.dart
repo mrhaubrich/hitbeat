@@ -37,4 +37,20 @@ class Album extends Equatable {
     tracks: const [],
     artist: Artist.empty,
   );
+
+  /// Creates a copy of the [Album] with the given fields replaced by
+  /// the new values.
+  Album copyWith({
+    String? name,
+    Uint8List? cover,
+    List<Track>? tracks,
+    Artist? artist,
+  }) {
+    return Album(
+      name: name ?? this.name,
+      cover: cover ?? this.cover,
+      tracks: tracks ?? this.tracks,
+      artist: artist ?? this.artist,
+    );
+  }
 }

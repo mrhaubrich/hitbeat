@@ -31,4 +31,18 @@ class Artist extends Equatable {
     name: 'Select an artist',
     albums: [],
   );
+
+  /// Creates a copy of the [Artist] with the given fields replaced by
+  /// the new values.
+  Artist copyWith({
+    String? name,
+    Uint8List? image,
+    List<Album>? albums,
+  }) {
+    return Artist(
+      name: name ?? this.name,
+      image: image ?? this.image,
+      albums: albums ?? this.albums,
+    );
+  }
 }

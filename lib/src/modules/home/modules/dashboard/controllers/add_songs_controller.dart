@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hitbeat/src/data/repositories/track_repository.dart';
 import 'package:hitbeat/src/modules/home/modules/dashboard/services/file_handler_service.dart';
 import 'package:hitbeat/src/modules/player/interfaces/metadata_extractor.dart';
+import 'package:hitbeat/src/modules/player/models/track.dart';
 
 /// {@template add_songs_state}
 /// The state of the [AddSongsController].
@@ -12,6 +13,7 @@ class AddSongsState {
     this.isDragging = false,
     this.isLoading = false,
     this.error,
+    this.songs = const [],
   });
 
   /// Whether the user is dragging files.
@@ -23,17 +25,22 @@ class AddSongsState {
   /// The error message.
   final String? error;
 
+  /// The list of songs.
+  final List<Track> songs;
+
   /// Creates a copy of this state with the given fields replaced by
   /// the new values.
   AddSongsState copyWith({
     bool? isDragging,
     bool? isLoading,
     String? error,
+    List<Track>? songs,
   }) {
     return AddSongsState(
       isDragging: isDragging ?? this.isDragging,
       isLoading: isLoading ?? this.isLoading,
       error: error ?? this.error,
+      songs: songs ?? this.songs,
     );
   }
 }
@@ -101,6 +108,29 @@ class AddSongsController extends ValueNotifier<AddSongsState> {
 
   Future<void> _processFiles(List<String> paths) async {
     final tracks = _metadataExtractor.extractTracks(paths);
-    await _trackRepository.insertTracks(tracks);
+    // Update state with extracted tracks instead of saving them
+    value = value.copyWith(
+      songs: tracks,
+      isLoading: false,
+      isDragging: false,
+    );
+  }
+
+  /// Saves the list of songs.
+  Future<void> saveSongs(List<Track> songs) async {
+    value = value.copyWith(isLoading: true);
+    try {
+      await _trackRepository.insertTracks(songs);
+      value = const AddSongsState();
+      //
+      // ignore: avoid_catches_without_on_clauses
+    } catch (e) {
+      value = value.copyWith(isLoading: false, error: e.toString());
+    }
+  }
+
+  /// Clears the list of songs.
+  void clearSongs() {
+    value = const AddSongsState();
   }
 }

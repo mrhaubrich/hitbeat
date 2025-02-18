@@ -3,6 +3,7 @@ import 'package:flutter_modular/flutter_modular.dart';
 import 'package:hitbeat/src/modules/home/modules/dashboard/controllers/add_songs_controller.dart';
 import 'package:hitbeat/src/modules/home/modules/dashboard/services/file_handler_service.dart';
 import 'package:hitbeat/src/modules/home/modules/dashboard/widgets/drop_zone_widget.dart';
+import 'package:hitbeat/src/modules/home/modules/dashboard/widgets/song_editor_widget.dart';
 import 'package:hitbeat/src/modules/home/widgets/miolo.dart';
 
 /// {@template add_songs_page}
@@ -38,7 +39,8 @@ class _AddSongsPageState extends State<AddSongsPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(state.error!)),
       );
-    } else if (!state.isLoading && !state.isDragging) {
+    } else if (!state.isLoading && state.songs.isEmpty) {
+      // Only show success message when songs are saved (cleared from state)
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Songs added successfully!')),
       );
@@ -66,12 +68,27 @@ class _AddSongsPageState extends State<AddSongsPage> {
       child: ValueListenableBuilder<AddSongsState>(
         valueListenable: _controller,
         builder: (context, state, _) {
-          return DropZoneWidget(
-            isDragging: state.isDragging,
-            isLoading: state.isLoading,
-            onTap: _controller.handleFileDrop,
-            onDrop: _controller.handleNativeFileDrop,
-            onDragState: _controller.setDragging,
+          return Row(
+            children: [
+              Expanded(
+                child: DropZoneWidget(
+                  isDragging: state.isDragging,
+                  isLoading: state.isLoading,
+                  onTap: _controller.handleFileDrop,
+                  onDrop: _controller.handleNativeFileDrop,
+                  onDragState: _controller.setDragging,
+                ),
+              ),
+              const VerticalDivider(width: 1),
+              Expanded(
+                child: SongEditorWidget(
+                  songs: state.songs,
+                  isLoading: state.isLoading,
+                  onSave: _controller.saveSongs,
+                  onCancel: _controller.clearSongs,
+                ),
+              ),
+            ],
           );
         },
       ),
