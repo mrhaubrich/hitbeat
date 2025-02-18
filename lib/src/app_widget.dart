@@ -10,7 +10,16 @@ class AppWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp.router(
       title: 'My Smart App',
-      theme: ThemeData(primarySwatch: Colors.blue),
+      theme: ThemeData(
+        primarySwatch: Colors.red,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFFcf352e),
+          brightness: Brightness.dark,
+          surface: const Color(0xFF212121),
+          primary: const Color(0xFFcf352e),
+          secondary: const Color(0xFFcf862e),
+        ),
+      ),
       routerConfig: Modular.routerConfig,
     ); //added by extension
   }
