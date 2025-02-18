@@ -60,42 +60,35 @@ class _TrackPageState extends State<TrackPage> {
             );
           }
 
-          return StreamBuilder<Track?>(
-            stream: _player.currentTrack$,
-            builder: (context, currentTrackSnapshot) {
-              final currentTrack = currentTrackSnapshot.data;
+          return ListView.builder(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            prototypeItem: TrackListTile(
+              track: Track.empty,
+              onTap: () {},
+              player: _player,
+            ),
+            itemCount: tracks.length,
+            itemBuilder: (context, index) {
+              final track = tracks[index];
 
-              return StreamBuilder<TrackState>(
-                stream: _player.trackState$,
-                builder: (context, stateSnapshot) {
-                  return ListView.builder(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    prototypeItem: TrackListTile(
-                      track: Track.empty,
-                      trackState: TrackState.notPlaying,
-                      onTap: () {},
+              return TrackListTile(
+                track: track,
+                player: _player,
+                onTap: () {
+                  final trackState = _player.trackState;
+                  final currentTrack = _player.currentTrack;
+                  final isCurrentTrack = currentTrack?.path == track.path;
+
+                  final trackPlaybackState =
+                      isCurrentTrack ? trackState : TrackState.notPlaying;
+
+                  _bloc.add(
+                    TrackPlayPauseRequested(
+                      track: track,
+                      tracklist: tracks,
+                      isCurrentTrack: isCurrentTrack,
+                      shouldPlay: trackPlaybackState != TrackState.playing,
                     ),
-                    itemCount: tracks.length,
-                    itemBuilder: (context, index) {
-                      final track = tracks[index];
-                      final isCurrentTrack = currentTrack?.path == track.path;
-                      final trackState = isCurrentTrack
-                          ? (stateSnapshot.data ?? TrackState.notPlaying)
-                          : TrackState.notPlaying;
-
-                      return TrackListTile(
-                        track: track,
-                        trackState: trackState,
-                        onTap: () => _bloc.add(
-                          TrackPlayPauseRequested(
-                            track: track,
-                            tracklist: tracks,
-                            isCurrentTrack: isCurrentTrack,
-                            shouldPlay: trackState != TrackState.playing,
-                          ),
-                        ),
-                      );
-                    },
                   );
                 },
               );

@@ -284,4 +284,15 @@ class AudioPlayerJustAudio implements IAudioPlayer {
 
   @override
   Stream<TrackState> get trackState$ => _trackStateController.stream;
+
+  @override
+  TrackState get trackState {
+    if (_player.processingState == just_audio.ProcessingState.completed) {
+      return TrackState.notPlaying;
+    } else if (_player.playing) {
+      return TrackState.playing;
+    } else {
+      return TrackState.paused;
+    }
+  }
 }

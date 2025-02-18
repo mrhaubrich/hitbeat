@@ -116,4 +116,7 @@ abstract class IAudioPlayer {
 
   /// Stream of the current track state
   Stream<TrackState> get trackState$;
+
+  /// Stream of the current track duration
+  TrackState get trackState;
 }
