@@ -41,6 +41,33 @@ class SongEditorWidget extends StatelessWidget {
         Expanded(
           child: ListView.builder(
             itemCount: songs.length,
+            prototypeItem: Card(
+              margin: const EdgeInsets.all(8),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Song ${-100}'),
+                    TextFormField(
+                      initialValue: 'song.name',
+                      decoration: const InputDecoration(labelText: 'Title'),
+                      onChanged: (_) {},
+                    ),
+                    TextFormField(
+                      initialValue: 'song.artist.name',
+                      decoration: const InputDecoration(labelText: 'Artist'),
+                      onChanged: (_) {},
+                    ),
+                    TextFormField(
+                      initialValue: 'song.album.name',
+                      decoration: const InputDecoration(labelText: 'Album'),
+                      onChanged: (_) {},
+                    ),
+                  ],
+                ),
+              ),
+            ),
             itemBuilder: (context, index) {
               final song = songs[index];
               return Card(
