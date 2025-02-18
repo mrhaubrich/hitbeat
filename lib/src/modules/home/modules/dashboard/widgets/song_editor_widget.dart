@@ -71,6 +71,7 @@ class SongEditorWidget extends StatelessWidget {
             itemBuilder: (context, index) {
               final song = songs[index];
               return Card(
+                key: ValueKey(song.path),
                 margin: const EdgeInsets.all(8),
                 child: Padding(
                   padding: const EdgeInsets.all(16),
