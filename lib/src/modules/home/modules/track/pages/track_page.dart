@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_modular/flutter_modular.dart';
-import 'package:hitbeat/src/modules/home/modules/track/controllers/track_controller.dart';
+import 'package:hitbeat/src/modules/home/modules/track/blocs/track_bloc.dart';
 import 'package:hitbeat/src/modules/home/modules/track/widgets/track_list_tile.dart';
 import 'package:hitbeat/src/modules/player/enums/track_state.dart';
 import 'package:hitbeat/src/modules/player/interfaces/player.dart';
@@ -18,26 +19,26 @@ class TrackPage extends StatefulWidget {
 }
 
 class _TrackPageState extends State<TrackPage> {
-  final _controller = Modular.get<TrackController>();
+  late final _bloc = Modular.get<TrackBloc>();
   final _player = Modular.get<IAudioPlayer>();
 
   @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
+  void initState() {
+    super.initState();
+    _bloc.add(const TrackSubscriptionRequested());
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: StreamBuilder(
-        stream: _controller.tracks$,
-        builder: (context, tracksSnapshot) {
-          if (!tracksSnapshot.hasData) {
+      body: BlocBuilder<TrackBloc, TrackBlocState>(
+        bloc: _bloc,
+        builder: (context, state) {
+          if (state is! TrackLoaded) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          final tracks = tracksSnapshot.data!;
+          final tracks = state.tracks;
 
           if (tracks.isEmpty) {
             return Center(
@@ -73,7 +74,6 @@ class _TrackPageState extends State<TrackPage> {
                     itemCount: tracks.length,
                     itemBuilder: (context, index) {
                       final track = tracks[index];
-
                       final isCurrentTrack = currentTrack?.path == track.path;
                       final trackState = isCurrentTrack
                           ? (stateSnapshot.data ?? TrackState.notPlaying)
@@ -82,18 +82,14 @@ class _TrackPageState extends State<TrackPage> {
                       return TrackListTile(
                         track: track,
                         trackState: trackState,
-                        onTap: () {
-                          if (isCurrentTrack) {
-                            _player.setIsPlaying(
-                              isPlaying: trackState != TrackState.playing,
-                            );
-                          } else {
-                            _player.play(
-                              track,
-                              tracklist: tracks,
-                            );
-                          }
-                        },
+                        onTap: () => _bloc.add(
+                          TrackPlayPauseRequested(
+                            track: track,
+                            tracklist: tracks,
+                            isCurrentTrack: isCurrentTrack,
+                            shouldPlay: trackState != TrackState.playing,
+                          ),
+                        ),
                       );
                     },
                   );
