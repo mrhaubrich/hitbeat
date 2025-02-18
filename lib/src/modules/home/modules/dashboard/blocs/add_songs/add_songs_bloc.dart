@@ -35,38 +35,38 @@ class AddSongsBloc extends Bloc<AddSongsEvent, AddSongsState> {
     AddSongsPickFiles event,
     Emitter<AddSongsState> emit,
   ) async {
-    try {
-      emit(const AddSongsLoading());
-      final paths = await _fileHandler.pickFiles();
-      if (paths.isEmpty) {
-        emit(const AddSongsInitial());
-        return;
-      }
-      await _processFiles(paths, emit);
-      //
-      // ignore: avoid_catches_without_on_clauses
-    } catch (e) {
-      emit(AddSongsError(e.toString()));
+    // try {
+    emit(const AddSongsLoading());
+    final paths = await _fileHandler.pickFiles();
+    if (paths.isEmpty) {
+      emit(const AddSongsInitial());
+      return;
     }
+    await _processFiles(paths, emit);
+    //
+    //   // ignore: avoid_catches_without_on_clauses
+    // } catch (e) {
+    //   emit(AddSongsError(e.toString()));
+    // }
   }
 
   Future<void> _onDropFiles(
     AddSongsDropFiles event,
     Emitter<AddSongsState> emit,
   ) async {
-    try {
-      emit(const AddSongsLoading());
-      final paths = await _fileHandler.handleUris(event.uris);
-      if (paths.isEmpty) {
-        emit(const AddSongsInitial());
-        return;
-      }
-      await _processFiles(paths, emit);
-      //
-      // ignore: avoid_catches_without_on_clauses
-    } catch (e) {
-      emit(AddSongsError(e.toString()));
+    // try {
+    emit(const AddSongsLoading());
+    final paths = await _fileHandler.handleUris(event.uris);
+    if (paths.isEmpty) {
+      emit(const AddSongsInitial());
+      return;
     }
+    await _processFiles(paths, emit);
+    //
+    // ignore: avoid_catches_without_on_clauses
+    // } catch (e) {
+    //   emit(AddSongsError(e.toString()));
+    // }
   }
 
   Future<void> _processFiles(
@@ -81,15 +81,15 @@ class AddSongsBloc extends Bloc<AddSongsEvent, AddSongsState> {
     AddSongsSave event,
     Emitter<AddSongsState> emit,
   ) async {
-    try {
-      emit(const AddSongsLoading());
-      await _trackRepository.insertTracks(event.songs);
-      emit(const AddSongsSuccess());
-      //
-      // ignore: avoid_catches_without_on_clauses
-    } catch (e) {
-      emit(AddSongsError(e.toString()));
-    }
+    // try {
+    emit(const AddSongsLoading());
+    await _trackRepository.insertTracks(event.songs);
+    emit(const AddSongsSuccess());
+    //
+    // ignore: avoid_catches_without_on_clauses
+    // } catch (e) {
+    //   emit(AddSongsError(e.toString()));
+    // }
   }
 
   void _onClear(

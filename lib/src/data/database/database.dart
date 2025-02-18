@@ -31,8 +31,8 @@ class Albums extends Table {
   /// The name of the album.
   TextColumn get name => text()();
 
-  /// The cover of the album.
-  BlobColumn get cover => blob().nullable()();
+  /// The cover hash of the album.
+  TextColumn get coverHash => text().nullable()();
 
   /// The artist of the album.
   IntColumn get artistId => integer().references(Artists, #id)();
@@ -243,7 +243,7 @@ class HitBeatDatabase extends _$HitBeatDatabase {
     return DbAlbum(
       id: album.id,
       name: album.name,
-      cover: album.cover,
+      coverHash: album.coverHash,
       artist: dbArtist,
     );
   }

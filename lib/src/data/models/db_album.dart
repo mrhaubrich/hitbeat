@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:hitbeat/src/data/models/db_artist.dart';
 import 'package:hitbeat/src/modules/player/models/album.dart';
 
@@ -12,7 +10,7 @@ class DbAlbum {
     required this.id,
     required this.name,
     required this.artist,
-    this.cover,
+    this.coverHash,
   });
 
   /// Creates a [DbAlbum] from a map.
@@ -20,7 +18,7 @@ class DbAlbum {
     return DbAlbum(
       id: map['id'] as int,
       name: map['name'] as String,
-      cover: map['cover'] as Uint8List?,
+      coverHash: map['coverHash'] as String?,
       artist: map['artist'] as DbArtist,
     );
   }
@@ -30,7 +28,7 @@ class DbAlbum {
     return DbAlbum(
       id: 0, // This should be set when inserting into the database
       name: album.name,
-      cover: album.cover,
+      coverHash: album.coverHash,
       artist: DbArtist.fromEntity(album.artist),
     );
   }
@@ -42,7 +40,7 @@ class DbAlbum {
   final String name;
 
   /// The cover of the album.
-  final Uint8List? cover;
+  final String? coverHash;
 
   /// The artist of the album.
   final DbArtist artist;
@@ -52,7 +50,7 @@ class DbAlbum {
     return {
       'id': id,
       'name': name,
-      'cover': cover,
+      'coverHash': coverHash,
       'artist_id': artist.id,
     };
   }
@@ -61,7 +59,7 @@ class DbAlbum {
   Album toEntity() {
     return Album(
       name: name,
-      cover: cover,
+      coverHash: coverHash,
       tracks: const [], // Tracks should be loaded separately
       artist: artist.toEntity(),
     );

@@ -26,7 +26,7 @@ class TrackRepository {
 
   Future<int> _getOrCreateAlbum(
     String name,
-    Uint8List? cover,
+    String? coverHash,
     int artistId,
   ) async {
     final existingAlbum =
@@ -36,7 +36,7 @@ class TrackRepository {
     return _database.insertAlbum(
       AlbumsCompanion.insert(
         name: name,
-        cover: Value(cover),
+        coverHash: Value(coverHash),
         artistId: artistId,
       ),
     );
@@ -64,7 +64,7 @@ class TrackRepository {
     // Get or create album
     final albumId = await _getOrCreateAlbum(
       dbTrack.album.name,
-      dbTrack.album.cover,
+      dbTrack.album.coverHash,
       artistId,
     );
 

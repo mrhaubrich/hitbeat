@@ -8,12 +8,17 @@ import 'package:hitbeat/src/modules/player/models/album.dart';
 import 'package:hitbeat/src/modules/player/models/artist.dart';
 import 'package:hitbeat/src/modules/player/models/genre.dart';
 import 'package:hitbeat/src/modules/player/models/track.dart';
+import 'package:hitbeat/src/services/cover_cache_service.dart';
 
 /// {@template metadata_extractor}
 /// A class that extracts metadata from audio files.
 /// {@endtemplate}
 class MetadataExtractor implements IMetadataExtractor {
+  /// {@macro metadata_extractor}
+  MetadataExtractor(this._coverCache);
+
   AudioMetadata? _metadata;
+  final CoverCacheService _coverCache;
 
   @override
   void dispose() {
@@ -56,10 +61,13 @@ class MetadataExtractor implements IMetadataExtractor {
   }
 
   Album _extractAlbum() {
+    final coverData = _extractCoverArt();
+    final coverHash = _coverCache.storeCover(coverData);
+
     return Album(
       name: _metadata!.album ?? 'Unknown',
       artist: _extractArtist(),
-      cover: _extractCoverArt(),
+      coverHash: coverHash,
       tracks: const [],
     );
   }

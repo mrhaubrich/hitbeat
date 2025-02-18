@@ -1,8 +1,10 @@
-import 'dart:typed_data' show Uint8List;
+import 'dart:typed_data';
 
 import 'package:equatable/equatable.dart';
+import 'package:flutter_modular/flutter_modular.dart';
 import 'package:hitbeat/src/modules/player/models/artist.dart';
 import 'package:hitbeat/src/modules/player/models/track.dart';
+import 'package:hitbeat/src/services/cover_cache_service.dart';
 
 /// {@template album}
 /// Represents an album that contains multiple tracks.
@@ -13,14 +15,14 @@ class Album extends Equatable {
     required this.name,
     required this.tracks,
     required this.artist,
-    this.cover,
+    this.coverHash,
   });
 
   /// The name of the album
   final String name;
 
-  /// The album cover
-  final Uint8List? cover;
+  /// The hash reference to the album cover
+  final String? coverHash;
 
   /// The tracks in the album
   final List<Track> tracks;
@@ -29,7 +31,14 @@ class Album extends Equatable {
   final Artist artist;
 
   @override
-  List<Object?> get props => [name, cover, tracks, artist];
+  List<Object?> get props => [name, coverHash, tracks, artist];
+
+  /// The cover art of the album
+  Uint8List? get cover {
+    final coverCache = Modular.get<CoverCacheService>();
+
+    return coverCache.getCover(coverHash);
+  }
 
   /// An empty album
   static Album empty = Album(
@@ -42,13 +51,13 @@ class Album extends Equatable {
   /// the new values.
   Album copyWith({
     String? name,
-    Uint8List? cover,
+    String? coverHash,
     List<Track>? tracks,
     Artist? artist,
   }) {
     return Album(
       name: name ?? this.name,
-      cover: cover ?? this.cover,
+      coverHash: coverHash ?? this.coverHash,
       tracks: tracks ?? this.tracks,
       artist: artist ?? this.artist,
     );
