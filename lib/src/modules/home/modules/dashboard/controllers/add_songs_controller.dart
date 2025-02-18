@@ -10,14 +10,10 @@ import 'package:hitbeat/src/modules/player/models/track.dart';
 class AddSongsState {
   /// {@macro add_songs_state}
   const AddSongsState({
-    this.isDragging = false,
     this.isLoading = false,
     this.error,
     this.songs = const [],
   });
-
-  /// Whether the user is dragging files.
-  final bool isDragging;
 
   /// Whether the controller is loading.
   final bool isLoading;
@@ -31,13 +27,11 @@ class AddSongsState {
   /// Creates a copy of this state with the given fields replaced by
   /// the new values.
   AddSongsState copyWith({
-    bool? isDragging,
     bool? isLoading,
     String? error,
     List<Track>? songs,
   }) {
     return AddSongsState(
-      isDragging: isDragging ?? this.isDragging,
       isLoading: isLoading ?? this.isLoading,
       error: error ?? this.error,
       songs: songs ?? this.songs,
@@ -61,12 +55,6 @@ class AddSongsController extends ValueNotifier<AddSongsState> {
   final IMetadataExtractor _metadataExtractor;
   final TrackRepository _trackRepository;
   final FileHandlerService _fileHandler;
-
-  /// Sets the dragging state.
-  // ignore: avoid_positional_boolean_parameters
-  void setDragging(bool isDragging) {
-    value = value.copyWith(isDragging: isDragging);
-  }
 
   /// Handles the file drop event.
   Future<void> handleFileDrop() async {
@@ -108,11 +96,9 @@ class AddSongsController extends ValueNotifier<AddSongsState> {
 
   Future<void> _processFiles(List<String> paths) async {
     final tracks = _metadataExtractor.extractTracks(paths);
-    // Update state with extracted tracks instead of saving them
     value = value.copyWith(
       songs: tracks,
       isLoading: false,
-      isDragging: false,
     );
   }
 

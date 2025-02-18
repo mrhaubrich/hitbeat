@@ -72,11 +72,10 @@ class _AddSongsPageState extends State<AddSongsPage> {
             children: [
               Expanded(
                 child: DropZoneWidget(
-                  isDragging: state.isDragging,
                   isLoading: state.isLoading,
                   onTap: _controller.handleFileDrop,
                   onDrop: _controller.handleNativeFileDrop,
-                  onDragState: _controller.setDragging,
+                  dragNDropBloc: Modular.get(),
                 ),
               ),
               const VerticalDivider(width: 1),
