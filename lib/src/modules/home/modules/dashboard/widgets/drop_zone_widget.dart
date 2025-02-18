@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hitbeat/src/modules/home/modules/dashboard/blocs/bloc/drag_n_drop_bloc.dart';
+import 'package:hitbeat/src/modules/home/modules/dashboard/blocs/drag_n_drop/drag_n_drop_bloc.dart';
 import 'package:super_drag_and_drop/super_drag_and_drop.dart';
 
 /// {@template drop_zone_widget}
