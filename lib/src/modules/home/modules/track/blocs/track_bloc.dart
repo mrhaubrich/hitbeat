@@ -7,7 +7,11 @@ import 'package:hitbeat/src/modules/player/models/track.dart';
 part 'track_event.dart';
 part 'track_state.dart';
 
+/// {@template track_bloc}
+/// A BLoC to manage the track state.
+/// {@endtemplate}
 class TrackBloc extends Bloc<TrackEvent, TrackBlocState> {
+  /// {@macro track_bloc}
   TrackBloc({
     required TrackController controller,
     required IAudioPlayer player,

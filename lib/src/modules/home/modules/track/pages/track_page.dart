@@ -34,6 +34,10 @@ class _TrackPageState extends State<TrackPage> {
       body: BlocBuilder<TrackBloc, TrackBlocState>(
         bloc: _bloc,
         builder: (context, state) {
+          if (state is TrackLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
           if (state is! TrackLoaded) {
             return const Center(child: CircularProgressIndicator());
           }
