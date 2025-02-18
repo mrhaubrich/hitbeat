@@ -8,7 +8,11 @@ import 'package:hitbeat/src/modules/player/models/track.dart';
 part 'add_songs_event.dart';
 part 'add_songs_state.dart';
 
+/// {@template add_songs_bloc}
+/// A BLoC that handles adding songs to the database.
+/// {@endtemplate}
 class AddSongsBloc extends Bloc<AddSongsEvent, AddSongsState> {
+  /// {@macro add_songs_bloc}
   AddSongsBloc({
     required IMetadataExtractor metadataExtractor,
     required TrackRepository trackRepository,
@@ -39,6 +43,8 @@ class AddSongsBloc extends Bloc<AddSongsEvent, AddSongsState> {
         return;
       }
       await _processFiles(paths, emit);
+      //
+      // ignore: avoid_catches_without_on_clauses
     } catch (e) {
       emit(AddSongsError(e.toString()));
     }
@@ -56,6 +62,8 @@ class AddSongsBloc extends Bloc<AddSongsEvent, AddSongsState> {
         return;
       }
       await _processFiles(paths, emit);
+      //
+      // ignore: avoid_catches_without_on_clauses
     } catch (e) {
       emit(AddSongsError(e.toString()));
     }
@@ -77,6 +85,8 @@ class AddSongsBloc extends Bloc<AddSongsEvent, AddSongsState> {
       emit(const AddSongsLoading());
       await _trackRepository.insertTracks(event.songs);
       emit(const AddSongsSuccess());
+      //
+      // ignore: avoid_catches_without_on_clauses
     } catch (e) {
       emit(AddSongsError(e.toString()));
     }
