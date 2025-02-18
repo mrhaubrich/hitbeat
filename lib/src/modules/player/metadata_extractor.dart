@@ -83,7 +83,7 @@ class MetadataExtractor implements IMetadataExtractor {
   }
 
   @override
-  Track extractTrack(String path) {
+  Future<Track> extractTrack(String path) async {
     _metadata ??= _readMetadata(path);
 
     if (_metadata == null) {
@@ -109,8 +109,15 @@ class MetadataExtractor implements IMetadataExtractor {
   }
 
   @override
-  List<Track> extractTracks(List<String> paths) {
-    final tracks = paths.map(extractTrack);
-    return List<Track>.from(tracks);
+  Future<List<Track>> extractTracks(List<String> paths) async {
+    // asyncronously extract metadata from each file
+
+    final tracks = await Future.wait(
+      paths.map(
+        extractTrack,
+      ),
+    );
+
+    return tracks;
   }
 }

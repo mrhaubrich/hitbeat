@@ -10,13 +10,13 @@ abstract interface class IMetadataExtractor {
   ///
   /// [path] is the path to the audio file
   /// Returns a [Track] with all the metadata information
-  Track extractTrack(String path);
+  Future<Track> extractTrack(String path);
 
   /// Extracts metadata from multiple audio files
   ///
   /// [paths] is a list of paths to audio files
   /// Returns a list of [Track]s with all the metadata information
-  List<Track> extractTracks(List<String> paths);
+  Future<List<Track>> extractTracks(List<String> paths);
 
   /// Extracts the album cover art from an audio file
   ///

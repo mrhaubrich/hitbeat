@@ -73,7 +73,7 @@ class AddSongsBloc extends Bloc<AddSongsEvent, AddSongsState> {
     List<String> paths,
     Emitter<AddSongsState> emit,
   ) async {
-    final tracks = _metadataExtractor.extractTracks(paths);
+    final tracks = await _metadataExtractor.extractTracks(paths);
     emit(AddSongsLoaded(tracks));
   }
 

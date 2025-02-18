@@ -11,7 +11,7 @@ class PlayerModule extends Module {
   void exportedBinds(Injector i) {
     i
       ..addSingleton<IAudioPlayer>(AudioPlayerJustAudio.new)
-      ..add<IMetadataExtractor>(MetadataExtractor.new)
+      ..addSingleton<IMetadataExtractor>(MetadataExtractor.new)
       ..add<CoverCacheService>(CoverCacheService.new);
   }
 }
