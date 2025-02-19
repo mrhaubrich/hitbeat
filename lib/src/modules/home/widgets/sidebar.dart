@@ -1,21 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
-import 'package:hitbeat/src/colors.dart';
+import 'package:hitbeat/src/theme/sidebar_theme_extension.dart';
 import 'package:sidebarx/sidebarx.dart';
 
-/// Sidebar controller.
 class MySideBarController extends SidebarXController {
-  /// Sidebar controller.
   MySideBarController() : super(selectedIndex: 0);
 }
 
-/// Sidebar widget.
 class Sidebar extends StatelessWidget {
-  /// Sidebar widget.
   const Sidebar({
-    required this.controller,
+    required SidebarXController controller,
     super.key,
-  });
+  }) : _controller = controller;
+
   static final _items = [
     _SidebarItem(
       icon: Icons.dashboard,
@@ -46,33 +43,43 @@ class Sidebar extends StatelessWidget {
     ),
   ];
 
-  /// The controller of the sidebar.
-  final SidebarXController controller;
+  final SidebarXController _controller;
 
   @override
   Widget build(BuildContext context) {
+    final sidebarTheme = Theme.of(context).extension<SidebarThemeExtension>()!;
     return SidebarX(
-      controller: controller,
+      controller: _controller,
       theme: SidebarXTheme(
         margin: const EdgeInsets.all(10),
+        width: 80,
         decoration: BoxDecoration(
-          color: canvasColor,
+          color: sidebarTheme.canvasColor,
           borderRadius: BorderRadius.circular(20),
         ),
-        textStyle: const TextStyle(color: Colors.white),
-        selectedTextStyle: const TextStyle(color: Colors.white),
+        textStyle: TextStyle(color: sidebarTheme.textColor),
+        selectedTextStyle: TextStyle(color: sidebarTheme.textColor),
         itemTextPadding: const EdgeInsets.only(left: 30),
         selectedItemTextPadding: const EdgeInsets.only(left: 30),
         itemDecoration: BoxDecoration(
-          border: Border.all(color: canvasColor),
+          border: Border.all(color: sidebarTheme.canvasColor),
+        ),
+        itemMargin: EdgeInsets.zero,
+        selectedIconTheme: IconThemeData(
+          color: sidebarTheme.activeIconColor,
+          size: 24,
         ),
         selectedItemDecoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
-            color: actionColor.withValues(alpha: 0.37),
+            color: sidebarTheme.actionColor.withValues(alpha: 0.37),
           ),
-          gradient: const LinearGradient(
-            colors: [accentCanvasColor, canvasColor],
+          gradient: LinearGradient(
+            colors: [
+              sidebarTheme.accentCanvasColor,
+              sidebarTheme.accentCanvasColor,
+              sidebarTheme.actionColor,
+            ],
           ),
           boxShadow: [
             BoxShadow(
@@ -81,26 +88,27 @@ class Sidebar extends StatelessWidget {
             ),
           ],
         ),
-        iconTheme: const IconThemeData(
-          color: Colors.white,
+        iconTheme: IconThemeData(
+          color: sidebarTheme.textColor,
           size: 20,
         ),
       ),
       extendedTheme: SidebarXTheme(
         width: 250,
         decoration: BoxDecoration(
-          color: canvasColor,
+          color: sidebarTheme.canvasColor,
           borderRadius: BorderRadius.circular(20),
         ),
         margin: const EdgeInsets.all(10),
       ),
-      footerDivider: const Divider(
-        color: Colors.white,
+      footerDivider: Divider(
+        color: sidebarTheme.textColor,
         thickness: 0.5,
       ),
       headerBuilder: (context, extended) {
         return InkWell(
-          onTap: controller.toggleExtended,
+          borderRadius: BorderRadius.circular(20),
+          onTap: _controller.toggleExtended,
           child: DrawerHeader(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -116,10 +124,10 @@ class Sidebar extends StatelessWidget {
                   margin: extended
                       ? const EdgeInsets.only(top: 10)
                       : EdgeInsets.zero,
-                  child: const Text(
+                  child: Text(
                     'HitBeat',
                     style: TextStyle(
-                      color: white,
+                      color: sidebarTheme.textColor,
                       fontSize: 24,
                     ),
                     softWrap: false,
@@ -153,9 +161,7 @@ class _SidebarItem extends SidebarXItem {
   }) : super(
           onTap: () {
             Modular.to.navigate(route);
-            if (onTap != null) {
-              onTap();
-            }
+            if (onTap != null) onTap();
           },
         );
   final String route;

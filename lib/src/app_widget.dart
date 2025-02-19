@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:hitbeat/src/theme/custom_theme.dart';
 
 /// The main widget of the application.
 class AppWidget extends StatelessWidget {
@@ -10,16 +11,7 @@ class AppWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp.router(
       title: 'My Smart App',
-      theme: ThemeData(
-        primarySwatch: Colors.red,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFFcf352e),
-          brightness: Brightness.dark,
-          surface: const Color(0xFF212121),
-          primary: const Color(0xFFcf352e),
-          secondary: const Color(0xFFcf862e),
-        ),
-      ),
+      theme: customTheme,
       routerConfig: Modular.routerConfig,
     ); //added by extension
   }
