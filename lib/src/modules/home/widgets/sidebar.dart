@@ -104,36 +104,38 @@ class Sidebar extends StatelessWidget {
         thickness: 0.5,
       ),
       headerBuilder: (context, extended) {
-        return InkWell(
-          borderRadius: BorderRadius.circular(20),
-          onTap: _controller.toggleExtended,
-          child: DrawerHeader(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                AnimatedRotation(
-                  duration: const Duration(milliseconds: 300),
-                  turns: extended ? 1 : 0,
-                  child: const FlutterLogo(),
-                ),
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 300),
-                  height: extended ? 50 : 0,
-                  margin: extended
-                      ? const EdgeInsets.only(top: 10)
-                      : EdgeInsets.zero,
-                  child: Text(
-                    'HitBeat',
-                    style: TextStyle(
-                      color: sidebarTheme.textColor,
-                      fontSize: 24,
-                    ),
-                    softWrap: false,
-                    overflow: TextOverflow.fade,
-                    maxLines: 1,
+        return SizedBox(
+          width: double.infinity,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(20),
+            onTap: _controller.toggleExtended,
+            child: DrawerHeader(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  AnimatedRotation(
+                    duration: const Duration(milliseconds: 300),
+                    turns: extended ? 1 : 0,
+                    child: const FlutterLogo(),
                   ),
-                ),
-              ],
+                  Container(
+                    height: extended ? 50 : 0,
+                    margin: extended
+                        ? const EdgeInsets.only(top: 10)
+                        : EdgeInsets.zero,
+                    child: Text(
+                      'HitBeat',
+                      style: TextStyle(
+                        color: sidebarTheme.textColor,
+                        fontSize: 24,
+                      ),
+                      softWrap: false,
+                      overflow: TextOverflow.fade,
+                      maxLines: 1,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         );

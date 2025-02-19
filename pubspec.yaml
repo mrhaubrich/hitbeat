@@ -9,6 +9,7 @@ environment:
   sdk: ^3.6.0
 
 dependencies:
+  animated_size_and_fade: ^5.1.1
   audio_metadata_reader: ^1.1.0
   auto_size_text: ^3.0.0
   cached_network_image: ^3.4.1
