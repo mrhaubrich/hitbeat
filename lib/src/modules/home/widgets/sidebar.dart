@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:hitbeat/src/modules/home/widgets/animated_logo.dart';
 import 'package:hitbeat/src/theme/sidebar_theme_extension.dart';
 import 'package:sidebarx/sidebarx.dart';
 
@@ -113,25 +114,28 @@ class Sidebar extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  AnimatedRotation(
+                  AnimatedLogo(extended: extended),
+                  AnimatedContainer(
                     duration: const Duration(milliseconds: 300),
-                    turns: extended ? 1 : 0,
-                    child: const FlutterLogo(),
-                  ),
-                  Container(
                     height: extended ? 50 : 0,
                     margin: extended
                         ? const EdgeInsets.only(top: 10)
                         : EdgeInsets.zero,
-                    child: Text(
-                      'HitBeat',
-                      style: TextStyle(
-                        color: sidebarTheme.textColor,
-                        fontSize: 24,
+                    curve: Curves.easeInOut,
+                    child: AnimatedOpacity(
+                      duration: const Duration(milliseconds: 200),
+                      opacity: extended ? 1 : 0,
+                      child: Text(
+                        'HitBeat',
+                        style: TextStyle(
+                          color: sidebarTheme.textColor,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        softWrap: false,
+                        overflow: TextOverflow.fade,
+                        maxLines: 1,
                       ),
-                      softWrap: false,
-                      overflow: TextOverflow.fade,
-                      maxLines: 1,
                     ),
                   ),
                 ],
