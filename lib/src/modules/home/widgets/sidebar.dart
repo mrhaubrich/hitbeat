@@ -52,7 +52,6 @@ class Sidebar extends StatelessWidget {
       controller: _controller,
       theme: SidebarXTheme(
         margin: const EdgeInsets.all(10),
-        width: 80,
         decoration: BoxDecoration(
           color: sidebarTheme.canvasColor,
           borderRadius: BorderRadius.circular(20),
@@ -64,7 +63,6 @@ class Sidebar extends StatelessWidget {
         itemDecoration: BoxDecoration(
           border: Border.all(color: sidebarTheme.canvasColor),
         ),
-        itemMargin: EdgeInsets.zero,
         selectedIconTheme: IconThemeData(
           color: sidebarTheme.activeIconColor,
           size: 24,
