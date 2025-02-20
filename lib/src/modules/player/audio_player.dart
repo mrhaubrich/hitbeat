@@ -130,8 +130,8 @@ class AudioPlayerJustAudio implements IAudioPlayer {
   bool get shuffle => _player.shuffleModeEnabled;
 
   @override
-  void setShuffle({required bool shuffle}) {
-    _player.setShuffleModeEnabled(shuffle);
+  Future<void> setShuffle({required bool shuffle}) {
+    return _player.setShuffleModeEnabled(shuffle);
   }
 
   @override
@@ -206,8 +206,8 @@ class AudioPlayerJustAudio implements IAudioPlayer {
   @override
   Stream<Track?> get currentTrack$ => Rx.merge([
         _player.currentIndexStream.map((index) {
-          if (index != null) {
-            return _playlist.sequence[index].tag as Track;
+          if (index != null && index >= 0) {
+            return _playlist.sequence.elementAtOrNull(index)?.tag as Track?;
           }
           return null;
         }),

@@ -58,7 +58,7 @@ abstract class IAudioPlayer {
   bool get shuffle;
 
   /// Set the shuffle mode
-  FutureOr<void> setShuffle({required bool shuffle});
+  Future<void> setShuffle({required bool shuffle});
 
   /// Repeat mode
   Repeat get repeat;

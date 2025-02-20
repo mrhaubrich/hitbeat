@@ -6,7 +6,7 @@ import 'package:hitbeat/src/services/cover_cache_service.dart';
 import 'package:just_audio_media_kit/just_audio_media_kit.dart';
 import 'package:menubar/menubar.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await CoverCacheService.ensureInitialized();
