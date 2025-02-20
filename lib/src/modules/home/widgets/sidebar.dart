@@ -4,11 +4,15 @@ import 'package:hitbeat/src/modules/home/widgets/animated_logo.dart';
 import 'package:hitbeat/src/theme/sidebar_theme_extension.dart';
 import 'package:sidebarx/sidebarx.dart';
 
+/// The controller of the sidebar.
 class MySideBarController extends SidebarXController {
+  /// Creates a new sidebar controller.
   MySideBarController() : super(selectedIndex: 0);
 }
 
+/// The sidebar widget.
 class Sidebar extends StatelessWidget {
+  /// Creates a new sidebar widget.
   const Sidebar({
     required SidebarXController controller,
     super.key,
