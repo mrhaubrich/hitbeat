@@ -67,7 +67,7 @@ class HitbeatAudioHandler extends BaseAudioHandler {
 
     final coverCacheService = Modular.get<CoverCacheService>();
     final coverPath = coverCacheService.getCoverPath(track.album.coverHash);
-    final coverUri = Uri.tryParse(coverPath ?? '');
+    final coverUri = Uri.tryParse(coverPath != null ? 'file://$coverPath' : '');
 
     mediaItem.add(
       MediaItem(
