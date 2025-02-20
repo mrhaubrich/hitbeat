@@ -79,9 +79,9 @@ class Sidebar extends StatelessWidget {
           ),
           gradient: LinearGradient(
             colors: [
-              sidebarTheme.accentCanvasColor,
-              sidebarTheme.accentCanvasColor,
               sidebarTheme.actionColor,
+              // sidebarTheme.actionColor,
+              sidebarTheme.accentCanvasColor,
             ],
           ),
           boxShadow: [

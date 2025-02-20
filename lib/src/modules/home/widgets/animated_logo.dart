@@ -26,7 +26,11 @@ class AnimatedLogo extends StatelessWidget {
           angle: value * 2 * 3.14159,
           child: Transform.scale(
             scale: 1 + (value * 0.2),
-            child: const FlutterLogo(size: 48),
+            child: Image.asset(
+              'assets/logo/hitbeat-icon.png',
+              width: 48,
+              height: 48,
+            ),
           ),
         );
       },
