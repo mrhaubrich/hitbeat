@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 
+/// {@template animated_logo}
+/// A widget that displays a Flutter logo that rotates and scales.
+/// {@endtemplate}
 class AnimatedLogo extends StatelessWidget {
+  /// {@macro animated_logo}
   const AnimatedLogo({
     required this.extended,
     super.key,
   });
 
+  /// Whether the logo is extended.
   final bool extended;
 
   @override
