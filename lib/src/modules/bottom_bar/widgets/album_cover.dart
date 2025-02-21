@@ -134,13 +134,36 @@ class AlbumCover extends StatelessWidget {
           width: size,
           height: size,
           color: backgroundColor ?? Colors.grey[300],
-          child: _buildImage(),
+          child: _Image(
+            imageUrl: imageUrl,
+            placeholderIcon: placeholderIcon,
+            imageFile: imageFile,
+            imageBytes: imageBytes,
+            assetPath: assetPath,
+          ),
         ),
       ),
     );
   }
+}
 
-  Widget _buildImage() {
+class _Image extends StatelessWidget {
+  const _Image({
+    required this.imageUrl,
+    required this.placeholderIcon,
+    required this.imageFile,
+    required this.imageBytes,
+    required this.assetPath,
+  });
+
+  final String? imageUrl;
+  final Widget placeholderIcon;
+  final File? imageFile;
+  final Uint8List? imageBytes;
+  final String? assetPath;
+
+  @override
+  Widget build(BuildContext context) {
     if (imageUrl != null) {
       return CachedNetworkImage(
         imageUrl: imageUrl!,

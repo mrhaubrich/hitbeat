@@ -10,6 +10,7 @@ class AppWidget extends StatelessWidget {
   const AppWidget({super.key});
 
   Future<void> _initializeAudioHandler() async {
+    print('Initializing audio handler');
     if (HitbeatAudioHandler.isInitialized) {
       return;
     }

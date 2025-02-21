@@ -63,10 +63,12 @@ class _BottomBarState extends State<BottomBar> {
                         AnimatedCrossFade(
                           duration: const Duration(milliseconds: 300),
                           firstChild: const AlbumCover.asset(
+                            key: ValueKey(kNoAlbumCover),
                             path: kNoAlbumCover,
                           ),
                           secondChild: snapshot.data?.album.cover != null
                               ? AlbumCover.memory(
+                                  key: ValueKey(snapshot.data!.album.coverHash),
                                   bytes: snapshot.data!.album.cover!,
                                 )
                               : const SizedBox(),

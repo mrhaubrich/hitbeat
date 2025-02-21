@@ -86,22 +86,24 @@ class TrackListTile extends StatelessWidget {
             );
           },
         ),
-        trailing: StreamBuilder<TrackState>(
-          stream: player.trackState$,
-          builder: (context, snapshot) {
-            final isSelected = snapshot.data != TrackState.notPlaying;
-            final isCurrentTrack = player.currentTrack == track;
-            return AnimatedPlayPauseButton(
-              state: isCurrentTrack
-                  ? snapshot.data ?? TrackState.notPlaying
-                  : TrackState.notPlaying,
-              onPressed: onTap,
-              color: isSelected && isCurrentTrack
-                  ? Theme.of(context).primaryColor
-                  : null,
-              filled: isSelected && isCurrentTrack,
-            );
-          },
+        trailing: RepaintBoundary(
+          child: StreamBuilder<TrackState>(
+            stream: player.trackState$,
+            builder: (context, snapshot) {
+              final isSelected = snapshot.data != TrackState.notPlaying;
+              final isCurrentTrack = player.currentTrack == track;
+              return AnimatedPlayPauseButton(
+                state: isCurrentTrack
+                    ? snapshot.data ?? TrackState.notPlaying
+                    : TrackState.notPlaying,
+                onPressed: onTap,
+                color: isSelected && isCurrentTrack
+                    ? Theme.of(context).primaryColor
+                    : null,
+                filled: isSelected && isCurrentTrack,
+              );
+            },
+          ),
         ),
       ),
     );

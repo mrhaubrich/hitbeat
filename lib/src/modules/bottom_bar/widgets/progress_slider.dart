@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:hitbeat/src/modules/player/interfaces/player.dart';
+import 'package:hitbeat/src/modules/player/models/track.dart';
 import 'package:interactive_slider/interactive_slider.dart';
 
 /// {@template progress_slider}
@@ -28,8 +29,8 @@ class ProgressSlider extends StatefulWidget {
 class _ProgressSliderState extends State<ProgressSlider> {
   late final InteractiveSliderController _controller;
   late final StreamSubscription<Duration> _positionSubscription;
-  bool _isHovering = false;
-  Duration? hoverPosition;
+  final _isHoveringNotifier = ValueNotifier<bool>(false);
+  final _hoverPositionNotifier = ValueNotifier<Duration?>(null);
 
   String _formatDuration(Duration duration) {
     final minutes = duration.inMinutes;
@@ -50,7 +51,7 @@ class _ProgressSliderState extends State<ProgressSlider> {
     );
 
     _positionSubscription = widget.player.currentTime$.listen((event) {
-      if (hoverPosition == null) {
+      if (_hoverPositionNotifier.value == null) {
         _controller.value = event.inMilliseconds /
             (widget.player.currentTrack?.duration ?? Duration.zero)
                 .inMilliseconds;
@@ -62,6 +63,8 @@ class _ProgressSliderState extends State<ProgressSlider> {
   void dispose() {
     _positionSubscription.cancel();
     _controller.dispose();
+    _isHoveringNotifier.dispose();
+    _hoverPositionNotifier.dispose();
     super.dispose();
   }
 
@@ -69,44 +72,39 @@ class _ProgressSliderState extends State<ProgressSlider> {
   Widget build(BuildContext context) {
     return InteractiveSlider(
       padding: EdgeInsets.zero,
-      startIcon: StreamBuilder(
+      startIcon: _TimeText(
         stream: widget.player.currentTime$,
-        builder: (context, snapshot) {
-          return Text(
-            _formatDuration(snapshot.data ?? Duration.zero),
-            style: const TextStyle(color: Colors.white60, fontSize: 12),
-          );
-        },
+        formatDuration: _formatDuration,
       ),
-      endIcon: StreamBuilder(
+      endIcon: _DurationText(
         stream: widget.player.currentTrack$,
-        builder: (context, snapshot) {
-          return Text(
-            _formatDuration(snapshot.data?.duration ?? Duration.zero),
-            style: const TextStyle(color: Colors.white60, fontSize: 12),
+        formatDuration: _formatDuration,
+      ),
+      centerIcon: ValueListenableBuilder<bool>(
+        valueListenable: _isHoveringNotifier,
+        builder: (context, isHovering, _) {
+          if (!isHovering) return const SizedBox.shrink();
+          return ValueListenableBuilder<Duration?>(
+            valueListenable: _hoverPositionNotifier,
+            builder: (context, hoverPosition, _) {
+              return Text(
+                _formatDuration(hoverPosition ?? Duration.zero),
+                style: const TextStyle(color: Colors.white, fontSize: 12),
+              );
+            },
           );
         },
       ),
-      centerIcon: _isHovering
-          ? Text(
-              _formatDuration(hoverPosition ?? Duration.zero),
-              style: const TextStyle(color: Colors.white, fontSize: 12),
-            )
-          : null,
       controller: _controller,
       onProgressUpdated: (value) async {
-        setState(() {
-          _isHovering = false;
-        });
+        _isHoveringNotifier.value = false;
         final newPosition = Duration(
           milliseconds: (value *
                   (widget.player.currentTrack?.duration.inMilliseconds ?? 0))
               .round(),
         );
         await widget.onSeek?.call(newPosition);
-        setState(() {
-          hoverPosition = null;
-        });
+        _hoverPositionNotifier.value = null;
       },
       onFocused: (value) {
         final newPosition = Duration(
@@ -114,21 +112,63 @@ class _ProgressSliderState extends State<ProgressSlider> {
                   (widget.player.currentTrack?.duration.inMilliseconds ?? 0))
               .round(),
         );
-        setState(() {
-          _isHovering = true;
-          hoverPosition = newPosition;
-        });
+        _isHoveringNotifier.value = true;
+        _hoverPositionNotifier.value = newPosition;
       },
       onChanged: (value) {
-        if (!_isHovering) return;
+        if (!_isHoveringNotifier.value) return;
         final newDuration = Duration(
           milliseconds: (value *
                   (widget.player.currentTrack?.duration.inMilliseconds ?? 0))
               .round(),
         );
-        setState(() {
-          hoverPosition = newDuration;
-        });
+        _hoverPositionNotifier.value = newDuration;
+      },
+    );
+  }
+}
+
+class _TimeText extends StatelessWidget {
+  const _TimeText({
+    required this.stream,
+    required this.formatDuration,
+  });
+
+  final Stream<Duration> stream;
+  final String Function(Duration) formatDuration;
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<Duration>(
+      stream: stream,
+      builder: (context, snapshot) {
+        return Text(
+          formatDuration(snapshot.data ?? Duration.zero),
+          style: const TextStyle(color: Colors.white60, fontSize: 12),
+        );
+      },
+    );
+  }
+}
+
+class _DurationText extends StatelessWidget {
+  const _DurationText({
+    required this.stream,
+    required this.formatDuration,
+  });
+
+  final Stream<Track?> stream;
+  final String Function(Duration) formatDuration;
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder(
+      stream: stream,
+      builder: (context, snapshot) {
+        return Text(
+          formatDuration(snapshot.data?.duration ?? Duration.zero),
+          style: const TextStyle(color: Colors.white60, fontSize: 12),
+        );
       },
     );
   }

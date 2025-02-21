@@ -34,6 +34,7 @@ class HitbeatAudioHandler extends BaseAudioHandler {
         androidNotificationChannelId: 'com.mrhaubrich.hitbeat',
         androidNotificationChannelName: 'Hitbeat',
         androidNotificationOngoing: true,
+        preloadArtwork: true,
       ),
     );
   }
