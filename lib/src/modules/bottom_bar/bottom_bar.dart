@@ -81,7 +81,10 @@ class _BottomBarState extends State<BottomBar> {
                             }
                             return const SizedBox();
                           }(),
-                          crossFadeState: snapshot.data?.album.cover == null
+                          // Avoid triggering a synchronous disk read via Album.
+                          // cover.
+                          // Rely on the presence of a coverHash instead.
+                          crossFadeState: snapshot.data?.album.coverHash == null
                               ? CrossFadeState.showFirst
                               : CrossFadeState.showSecond,
                         ),

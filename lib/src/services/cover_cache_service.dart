@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:isolate';
 import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
@@ -29,33 +30,72 @@ class CoverCacheService {
     return cacheDir;
   }
 
-  String _generateCoverHash(Uint8List coverData) {
+  static String _generateCoverHashSync(Uint8List coverData) {
     final digest = md5.convert(coverData);
     return digest.toString();
   }
 
-  /// Stores the cover data in the cache directory
+  /// Offload hash generation to a separate isolate for large images to avoid
+  /// blocking the UI. For small images (< 200KB) we keep it synchronous to
+  /// reduce overhead.
+  Future<String> _generateCoverHashAsync(Uint8List coverData) async {
+    if (coverData.lengthInBytes < 200 * 1024) {
+      return _generateCoverHashSync(coverData);
+    }
+    final receivePort = ReceivePort();
+    await Isolate.spawn<_HashParams>(
+      _hashEntryPoint,
+      _HashParams(coverData, receivePort.sendPort),
+    );
+    return await receivePort.first as String;
+  }
+
+  static void _hashEntryPoint(_HashParams params) {
+    final result = _generateCoverHashSync(params.data);
+    params.sendPort.send(result);
+  }
+
+  /// Async variant to store cover without blocking UI.
+  Future<String?> storeCoverAsync(Uint8List? coverData) async {
+    if (coverData == null) return null;
+    final hash = await _generateCoverHashAsync(coverData);
+    final coverPath = p.join(_cacheDir, '$hash.jpg');
+    final file = File(coverPath);
+    if (!file.existsSync()) {
+      await file.writeAsBytes(coverData, flush: true);
+    }
+    return hash;
+  }
+
+  /// Stores the cover data in the cache directory (synchronous, legacy API).
   String? storeCover(Uint8List? coverData) {
     if (coverData == null) return null;
-
-    final hash = _generateCoverHash(coverData);
+    final hash = _generateCoverHashSync(coverData);
     final coverPath = p.join(_cacheDir, '$hash.jpg');
-
     final file = File(coverPath);
     if (!file.existsSync()) {
       file.writeAsBytesSync(coverData);
     }
-
     return hash;
   }
 
-  /// Retrieves the cover data from the cache directory
-  Uint8List? getCover(String? hash) {
-    if (hash == null) return null;
-
+  /// Async variant to retrieve cover without blocking UI.
+  Future<Uint8List?> getCoverAsync(String? hash) {
+    if (hash == null) return Future.value();
     final coverPath = p.join(_cacheDir, '$hash.jpg');
     final file = File(coverPath);
+    if (file.existsSync()) {
+      return file.readAsBytes();
+    }
+    return Future.value();
+  }
 
+  /// Retrieves the cover data from the cache directory
+  /// (synchronous, legacy API)
+  Uint8List? getCover(String? hash) {
+    if (hash == null) return null;
+    final coverPath = p.join(_cacheDir, '$hash.jpg');
+    final file = File(coverPath);
     if (file.existsSync()) {
       return file.readAsBytesSync();
     }
@@ -65,7 +105,13 @@ class CoverCacheService {
   /// Retrieves the cover path from the cache directory
   String? getCoverPath(String? hash) {
     if (hash == null) return null;
-
     return p.join(_cacheDir, '$hash.jpg');
   }
+}
+
+/// Payload used to communicate with hashing isolate.
+class _HashParams {
+  _HashParams(this.data, this.sendPort);
+  final Uint8List data;
+  final SendPort sendPort;
 }
