@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 /// {@template animated_logo}
@@ -13,27 +15,36 @@ class AnimatedLogo extends StatelessWidget {
   /// Whether the logo is extended.
   final bool extended;
 
+  static const _asset = AssetImage('assets/logo/hitbeat-icon.png');
+
   @override
   Widget build(BuildContext context) {
-    return TweenAnimationBuilder(
-      duration: const Duration(milliseconds: 300),
-      tween: Tween<double>(
-        begin: 0,
-        end: extended ? 1 : 0,
+    return RepaintBoundary(
+      child: TweenAnimationBuilder<double>(
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeOutCubic,
+        tween: Tween<double>(
+          begin: 0,
+          end: extended ? 1 : 0,
+        ),
+        child: const Image(
+          image: _asset,
+          width: 48,
+          height: 48,
+          filterQuality: FilterQuality.low,
+        ),
+        builder: (context, value, child) {
+          final scale = 1 + (value * 0.2);
+          final angle = value * 2 * math.pi;
+          return Transform(
+            alignment: Alignment.center,
+            transform: Matrix4.identity()
+              ..rotateZ(angle)
+              ..scale(scale, scale),
+            child: child,
+          );
+        },
       ),
-      builder: (context, double value, child) {
-        return Transform.rotate(
-          angle: value * 2 * 3.14159,
-          child: Transform.scale(
-            scale: 1 + (value * 0.2),
-            child: Image.asset(
-              'assets/logo/hitbeat-icon.png',
-              width: 48,
-              height: 48,
-            ),
-          ),
-        );
-      },
     );
   }
 }

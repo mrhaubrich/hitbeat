@@ -11,6 +11,17 @@ import 'package:menubar/menubar.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Pre-cache frequently used images (logo) after binding init, no UI block.
+  const logo = AssetImage('assets/logo/hitbeat-icon.png');
+  // Fire and forget precache once we have a root context via WidgetsBinding.
+  // We'll schedule it right after first frame.
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    final ctx = WidgetsBinding.instance.rootElement;
+    if (ctx != null) {
+      precacheImage(logo, ctx);
+    }
+  });
+
   // Kick off cover cache initialization but don't block first frame.
   unawaited(CoverCacheService.ensureInitialized());
 

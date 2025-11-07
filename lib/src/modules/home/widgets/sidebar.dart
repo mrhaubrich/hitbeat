@@ -53,109 +53,107 @@ class Sidebar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final sidebarTheme = Theme.of(context).extension<SidebarThemeExtension>()!;
-    return SidebarX(
-      controller: _controller,
-      theme: SidebarXTheme(
-        margin: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          color: sidebarTheme.canvasColor,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        textStyle: TextStyle(color: sidebarTheme.textColor),
-        selectedTextStyle: TextStyle(color: sidebarTheme.textColor),
-        itemTextPadding: const EdgeInsets.only(left: 30),
-        selectedItemTextPadding: const EdgeInsets.only(left: 30),
-        itemDecoration: BoxDecoration(
-          border: Border.all(color: sidebarTheme.canvasColor),
-        ),
-        selectedIconTheme: IconThemeData(
-          color: sidebarTheme.activeIconColor,
-          size: 24,
-        ),
-        selectedItemDecoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(
-            color: sidebarTheme.actionColor.withValues(alpha: 0.37),
-          ),
-          gradient: LinearGradient(
-            colors: [
-              sidebarTheme.actionColor,
-              // sidebarTheme.actionColor,
-              sidebarTheme.accentCanvasColor,
-            ],
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.28),
-              blurRadius: 30,
-            ),
-          ],
-        ),
-        iconTheme: IconThemeData(
-          color: sidebarTheme.textColor,
-          size: 20,
-        ),
+    final selectedItemDecoration = BoxDecoration(
+      borderRadius: BorderRadius.circular(10),
+      // Simpler decoration to reduce paint cost during sidebar animation
+      color: sidebarTheme.actionColor.withValues(alpha: 0.12),
+      border: Border.all(
+        color: sidebarTheme.actionColor.withValues(alpha: 0.37),
       ),
-      extendedTheme: SidebarXTheme(
-        width: 250,
-        decoration: BoxDecoration(
-          color: sidebarTheme.canvasColor,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        margin: const EdgeInsets.all(10),
-      ),
-      footerDivider: Divider(
-        color: sidebarTheme.textColor,
-        thickness: 0.5,
-      ),
-      headerBuilder: (context, extended) {
-        return SizedBox(
-          width: double.infinity,
-          child: InkWell(
+    );
+
+    return RepaintBoundary(
+      child: SidebarX(
+        controller: _controller,
+        theme: SidebarXTheme(
+          margin: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: sidebarTheme.canvasColor,
             borderRadius: BorderRadius.circular(20),
-            onTap: _controller.toggleExtended,
-            child: DrawerHeader(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  AnimatedLogo(extended: extended),
-                  AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
-                    height: extended ? 50 : 0,
-                    margin: extended
-                        ? const EdgeInsets.only(top: 10)
-                        : EdgeInsets.zero,
-                    curve: Curves.easeInOut,
-                    child: AnimatedOpacity(
-                      duration: const Duration(milliseconds: 200),
-                      opacity: extended ? 1 : 0,
-                      child: Text(
-                        'HitBeat',
-                        style: TextStyle(
-                          color: sidebarTheme.textColor,
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
+          ),
+          textStyle: TextStyle(color: sidebarTheme.textColor),
+          selectedTextStyle: TextStyle(color: sidebarTheme.textColor),
+          itemTextPadding: const EdgeInsets.only(left: 30),
+          selectedItemTextPadding: const EdgeInsets.only(left: 30),
+          itemDecoration: BoxDecoration(
+            border: Border.all(color: sidebarTheme.canvasColor),
+          ),
+          selectedIconTheme: IconThemeData(
+            color: sidebarTheme.activeIconColor,
+            size: 24,
+          ),
+          selectedItemDecoration: selectedItemDecoration,
+          iconTheme: IconThemeData(
+            color: sidebarTheme.textColor,
+            size: 20,
+          ),
+        ),
+        extendedTheme: SidebarXTheme(
+          width: 250,
+          decoration: BoxDecoration(
+            color: sidebarTheme.canvasColor,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          margin: const EdgeInsets.all(10),
+        ),
+        footerDivider: Divider(
+          color: sidebarTheme.textColor,
+          thickness: 0.5,
+        ),
+        headerBuilder: (context, extended) {
+          return SizedBox(
+            width: double.infinity,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(20),
+              onTap: _controller.toggleExtended,
+              child: DrawerHeader(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    RepaintBoundary(child: AnimatedLogo(extended: extended)),
+                    // Animate only the size/opacity area; clip repaint region.
+                    ClipRect(
+                      child: RepaintBoundary(
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 250),
+                          height: extended ? 50 : 0,
+                          margin: extended
+                              ? const EdgeInsets.only(top: 10)
+                              : EdgeInsets.zero,
+                          curve: Curves.easeOutCubic,
+                          child: AnimatedOpacity(
+                            duration: const Duration(milliseconds: 200),
+                            opacity: extended ? 1 : 0,
+                            child: Text(
+                              'HitBeat',
+                              style: TextStyle(
+                                color: sidebarTheme.textColor,
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              softWrap: false,
+                              overflow: TextOverflow.fade,
+                              maxLines: 1,
+                            ),
+                          ),
                         ),
-                        softWrap: false,
-                        overflow: TextOverflow.fade,
-                        maxLines: 1,
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-        );
-      },
-      items: _items,
-      footerItems: _footerItems,
-      footerFitType: FooterFitType.fit,
-      toggleButtonBuilder: (context, extended) {
-        return const SizedBox(
-          height: 10,
-        );
-      },
+          );
+        },
+        items: _items,
+        footerItems: _footerItems,
+        footerFitType: FooterFitType.fit,
+        toggleButtonBuilder: (context, extended) {
+          return const SizedBox(
+            height: 10,
+          );
+        },
+      ),
     );
   }
 }
