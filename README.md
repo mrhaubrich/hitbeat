@@ -55,6 +55,29 @@ flutter pub get
 flutter run
 ```
 
+### Switching Audio Backend
+
+HitBeat ships with two interchangeable audio backends behind the `IAudioPlayer` interface:
+
+1. JustAudio + MediaKit (default) – good general purpose, integrates with OS media controls.
+2. SoLoud (`flutter_soloud`) – low latency engine suited for advanced audio manipulation.
+
+To switch to SoLoud:
+
+1. Open `lib/src/modules/player/player_module.dart`.
+2. Uncomment the import line for `audio_player_soloud.dart`.
+3. Replace the `addSingleton<IAudioPlayer>(AudioPlayerJustAudio.new)` line with:
+  `..addSingleton<IAudioPlayer>(AudioPlayerSoLoud.new)`
+4. (Optional) Remove the `just_audio_media_kit` initialization in `main.dart` if not needed.
+
+Re-run:
+```bash
+flutter pub get
+flutter run
+```
+
+No other code changes are required; UI and services consume only `IAudioPlayer`.
+
 ## ⛏️ Built Using <a name = "built_using"></a>
 
 - [Flutter](https://flutter.dev/) - Framework
