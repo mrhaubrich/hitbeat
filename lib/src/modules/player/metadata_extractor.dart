@@ -56,9 +56,9 @@ class MetadataExtractor implements IMetadataExtractor {
     );
   }
 
-  Album _extractAlbum(AudioMetadata metadata) {
+  Future<Album> _extractAlbum(AudioMetadata metadata) async {
     final coverData = _extractCoverArt(metadata);
-    final coverHash = _coverCache.storeCover(coverData);
+    final coverHash = await _coverCache.storeCoverAsync(coverData);
 
     return Album(
       name: metadata.album ?? 'Unknown',
@@ -86,9 +86,10 @@ class MetadataExtractor implements IMetadataExtractor {
       throw Exception('Failed to read duration');
     }
 
+    final album = await _extractAlbum(metadata);
     final track = Track(
       name: metadata.title ?? 'Unknown',
-      album: _extractAlbum(metadata),
+      album: album,
       artist: _extractArtist(metadata),
       duration: metadata.duration!,
       path: 'file:///$path',
@@ -110,7 +111,12 @@ class MetadataExtractor implements IMetadataExtractor {
         final current = index++;
         if (current >= paths.length) break;
         final p = paths[current];
-        results[current] = await extractTrack(p);
+        try {
+          results[current] = await extractTrack(p);
+        } catch (_) {
+          // Swallow individual file errors to avoid aborting entire batch.
+          results[current] = null;
+        }
       }
     }
 

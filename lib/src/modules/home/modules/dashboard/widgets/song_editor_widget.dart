@@ -119,7 +119,11 @@ class SongEditorWidget extends StatelessWidget {
                                 .getCoverPath(hash);
                             if (path == null) return null;
                             return DecorationImage(
-                              image: FileImage(File(path)),
+                              image: ResizeImage(
+                                FileImage(File(path)),
+                                width: 120,
+                                height: 120,
+                              ),
                               fit: BoxFit.cover,
                             );
                           }(),

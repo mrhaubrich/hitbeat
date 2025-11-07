@@ -133,8 +133,10 @@ class _AlbumAvatar extends StatelessWidget {
     final file = File(path);
     return CircleAvatar(
       radius: 24,
-      backgroundImage: FileImage(
-        file,
+      backgroundImage: ResizeImage(
+        FileImage(file),
+        width: 48,
+        height: 48,
       ),
     );
   }

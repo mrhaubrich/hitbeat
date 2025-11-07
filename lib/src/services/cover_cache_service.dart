@@ -16,11 +16,14 @@ class CoverCacheService {
   static final CoverCacheService _instance = CoverCacheService._internal();
 
   static late final String _cacheDir;
+  static bool _isInitialized = false;
 
   /// Initializes the cache directory
   static Future<void> ensureInitialized() async {
+    if (_isInitialized) return;
     _cacheDir = await _getCacheDir();
     await Directory(_cacheDir).create(recursive: true);
+    _isInitialized = true;
   }
 
   static Future<String> _getCacheDir() async {
@@ -58,6 +61,9 @@ class CoverCacheService {
   /// Async variant to store cover without blocking UI.
   Future<String?> storeCoverAsync(Uint8List? coverData) async {
     if (coverData == null) return null;
+    if (!_isInitialized) {
+      await ensureInitialized();
+    }
     final hash = await _generateCoverHashAsync(coverData);
     final coverPath = p.join(_cacheDir, '$hash.jpg');
     final file = File(coverPath);
@@ -80,18 +86,20 @@ class CoverCacheService {
   }
 
   /// Async variant to retrieve cover without blocking UI.
-  Future<Uint8List?> getCoverAsync(String? hash) {
-    if (hash == null) return Future.value();
+  Future<Uint8List?> getCoverAsync(String? hash) async {
+    if (hash == null) return null;
+    if (!_isInitialized) {
+      await ensureInitialized();
+    }
     final coverPath = p.join(_cacheDir, '$hash.jpg');
     final file = File(coverPath);
-    if (file.existsSync()) {
+    if (await file.exists()) {
       return file.readAsBytes();
     }
-    return Future.value();
+    return null;
   }
 
-  /// Retrieves the cover data from the cache directory
-  /// (synchronous, legacy API)
+  /// Retrieves the cover data from the cache directory (synchronous, legacy API)
   Uint8List? getCover(String? hash) {
     if (hash == null) return null;
     final coverPath = p.join(_cacheDir, '$hash.jpg');
@@ -105,6 +113,7 @@ class CoverCacheService {
   /// Retrieves the cover path from the cache directory
   String? getCoverPath(String? hash) {
     if (hash == null) return null;
+    if (!_isInitialized) return null;
     return p.join(_cacheDir, '$hash.jpg');
   }
 }

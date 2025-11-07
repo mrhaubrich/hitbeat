@@ -1,3 +1,5 @@
+import 'dart:async' show unawaited;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:hitbeat/src/app_widget.dart';
@@ -9,13 +11,16 @@ import 'package:menubar/menubar.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await CoverCacheService.ensureInitialized();
+  // Kick off cover cache initialization but don't block first frame.
+  unawaited(CoverCacheService.ensureInitialized());
 
+  // MediaKit init is fast and required before audio player usage.
   JustAudioMediaKit.ensureInitialized(
     macOS: true,
   );
 
-  await setApplicationMenu([]);
+  // Don't await menu setup; perform after app starts.
+  unawaited(setApplicationMenu([]));
 
   return runApp(
     ModularApp(
