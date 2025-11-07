@@ -39,8 +39,8 @@ class Albums extends Table {
 
   @override
   List<Set<Column>> get uniqueKeys => [
-        {name, artistId},
-      ];
+    {name, artistId},
+  ];
 }
 
 /// Table for storing genres.
@@ -140,10 +140,9 @@ class HitBeatDatabase extends _$HitBeatDatabase {
 
   /// Returns all tracks in the database.
   Future<List<Track>> getAllTracks() {
-    return (select(tracks)
-          ..orderBy([
-            (t) => OrderingTerm(expression: t.name),
-          ]))
+    return (select(tracks)..orderBy([
+          (t) => OrderingTerm(expression: t.name),
+        ]))
         .get();
   }
 
@@ -186,41 +185,42 @@ class HitBeatDatabase extends _$HitBeatDatabase {
         trackGenres.genreId.equalsExp(genres.id),
         useColumns: false,
       ),
-    ])
-      ..where(trackGenres.trackId.equals(trackId));
+    ])..where(trackGenres.trackId.equals(trackId));
 
     return query.map((row) => row.readTable(genres)).get();
   }
 
   /// Returns the artist with the given [name], or `null` if no artist with that
   Future<Artist?> getArtistByName(String name) {
-    return (select(artists)..where((a) => a.name.equals(name)))
-        .getSingleOrNull();
+    return (select(
+      artists,
+    )..where((a) => a.name.equals(name))).getSingleOrNull();
   }
 
   /// Returns the album with the given [name] and [artistId], or `null`
   /// if no album with that
   /// name and artistId exists.
   Future<Album?> getAlbumByNameAndArtist(String name, int artistId) {
-    return (select(albums)
-          ..where((a) {
-            return a.name.equals(name) & a.artistId.equals(artistId);
-          }))
+    return (select(albums)..where((a) {
+          return a.name.equals(name) & a.artistId.equals(artistId);
+        }))
         .getSingleOrNull();
   }
 
   /// Returns the genre with the given [name], or `null` if no genre with that
   /// name exists.
   Future<Genre?> getGenreByName(String name) {
-    return (select(genres)..where((g) => g.name.equals(name)))
-        .getSingleOrNull();
+    return (select(
+      genres,
+    )..where((g) => g.name.equals(name))).getSingleOrNull();
   }
 
   /// Returns the track with the given [path], or `null` if no track with that
   /// path exists.
   Future<Track?> getTrackByPath(String path) {
-    return (select(tracks)..where((t) => t.path.equals(path)))
-        .getSingleOrNull();
+    return (select(
+      tracks,
+    )..where((t) => t.path.equals(path))).getSingleOrNull();
   }
 
   /// Returns the Album with the given [id], or `null` if no album with that

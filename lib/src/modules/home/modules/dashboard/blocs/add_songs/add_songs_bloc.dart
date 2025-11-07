@@ -17,10 +17,10 @@ class AddSongsBloc extends Bloc<AddSongsEvent, AddSongsState> {
     required IMetadataExtractor metadataExtractor,
     required TrackRepository trackRepository,
     required FileHandlerService fileHandler,
-  })  : _metadataExtractor = metadataExtractor,
-        _trackRepository = trackRepository,
-        _fileHandler = fileHandler,
-        super(const AddSongsInitial()) {
+  }) : _metadataExtractor = metadataExtractor,
+       _trackRepository = trackRepository,
+       _fileHandler = fileHandler,
+       super(const AddSongsInitial()) {
     on<AddSongsPickFiles>(_onPickFiles);
     on<AddSongsDropFiles>(_onDropFiles);
     on<AddSongsSave>(_onSave);
@@ -63,7 +63,6 @@ class AddSongsBloc extends Bloc<AddSongsEvent, AddSongsState> {
     }
     await _processFiles(paths, emit);
     //
-    // ignore: avoid_catches_without_on_clauses
     // } catch (e) {
     //   emit(AddSongsError(e.toString()));
     // }
@@ -86,7 +85,6 @@ class AddSongsBloc extends Bloc<AddSongsEvent, AddSongsState> {
     await _trackRepository.insertTracks(event.songs);
     emit(const AddSongsSuccess());
     //
-    // ignore: avoid_catches_without_on_clauses
     // } catch (e) {
     //   emit(AddSongsError(e.toString()));
     // }

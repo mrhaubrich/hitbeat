@@ -18,7 +18,7 @@ class AddSongsPage extends StatefulWidget {
 }
 
 class _AddSongsPageState extends State<AddSongsPage> {
-  late final _bloc = Modular.get<AddSongsBloc>();
+  late final AddSongsBloc _bloc = Modular.get<AddSongsBloc>();
 
   @override
   Widget build(BuildContext context) {

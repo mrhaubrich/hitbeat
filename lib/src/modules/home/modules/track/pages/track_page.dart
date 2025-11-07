@@ -19,8 +19,8 @@ class TrackPage extends StatefulWidget {
 }
 
 class _TrackPageState extends State<TrackPage> {
-  late final _bloc = Modular.get<TrackBloc>();
-  final _player = Modular.get<IAudioPlayer>();
+  late final TrackBloc _bloc = Modular.get<TrackBloc>();
+  final IAudioPlayer _player = Modular.get<IAudioPlayer>();
 
   @override
   void initState() {
@@ -79,8 +79,9 @@ class _TrackPageState extends State<TrackPage> {
                   final currentTrack = _player.currentTrack;
                   final isCurrentTrack = currentTrack?.path == track.path;
 
-                  final trackPlaybackState =
-                      isCurrentTrack ? trackState : TrackState.notPlaying;
+                  final trackPlaybackState = isCurrentTrack
+                      ? trackState
+                      : TrackState.notPlaying;
 
                   _bloc.add(
                     TrackPlayPauseRequested(

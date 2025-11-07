@@ -43,7 +43,8 @@ class _ProgressSliderState extends State<ProgressSlider> {
     super.initState();
     var initialTime = 0.0;
     if (widget.player.currentTrack != null) {
-      initialTime = widget.player.currentTime.inMilliseconds /
+      initialTime =
+          widget.player.currentTime.inMilliseconds /
           widget.player.currentTrack!.duration.inMilliseconds;
     }
     _controller = InteractiveSliderController(
@@ -52,7 +53,8 @@ class _ProgressSliderState extends State<ProgressSlider> {
 
     _positionSubscription = widget.player.currentTime$.listen((event) {
       if (_hoverPositionNotifier.value == null) {
-        _controller.value = event.inMilliseconds /
+        _controller.value =
+            event.inMilliseconds /
             (widget.player.currentTrack?.duration ?? Duration.zero)
                 .inMilliseconds;
       }
@@ -99,18 +101,22 @@ class _ProgressSliderState extends State<ProgressSlider> {
       onProgressUpdated: (value) async {
         _isHoveringNotifier.value = false;
         final newPosition = Duration(
-          milliseconds: (value *
-                  (widget.player.currentTrack?.duration.inMilliseconds ?? 0))
-              .round(),
+          milliseconds:
+              (value *
+                      (widget.player.currentTrack?.duration.inMilliseconds ??
+                          0))
+                  .round(),
         );
         await widget.onSeek?.call(newPosition);
         _hoverPositionNotifier.value = null;
       },
       onFocused: (value) {
         final newPosition = Duration(
-          milliseconds: (value *
-                  (widget.player.currentTrack?.duration.inMilliseconds ?? 0))
-              .round(),
+          milliseconds:
+              (value *
+                      (widget.player.currentTrack?.duration.inMilliseconds ??
+                          0))
+                  .round(),
         );
         _isHoveringNotifier.value = true;
         _hoverPositionNotifier.value = newPosition;
@@ -118,9 +124,11 @@ class _ProgressSliderState extends State<ProgressSlider> {
       onChanged: (value) {
         if (!_isHoveringNotifier.value) return;
         final newDuration = Duration(
-          milliseconds: (value *
-                  (widget.player.currentTrack?.duration.inMilliseconds ?? 0))
-              .round(),
+          milliseconds:
+              (value *
+                      (widget.player.currentTrack?.duration.inMilliseconds ??
+                          0))
+                  .round(),
         );
         _hoverPositionNotifier.value = newDuration;
       },

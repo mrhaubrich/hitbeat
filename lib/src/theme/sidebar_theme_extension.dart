@@ -52,8 +52,11 @@ class SidebarThemeExtension extends ThemeExtension<SidebarThemeExtension> {
     return SidebarThemeExtension(
       canvasColor: Color.lerp(canvasColor, other.canvasColor, t)!,
       actionColor: Color.lerp(actionColor, other.actionColor, t)!,
-      accentCanvasColor:
-          Color.lerp(accentCanvasColor, other.accentCanvasColor, t)!,
+      accentCanvasColor: Color.lerp(
+        accentCanvasColor,
+        other.accentCanvasColor,
+        t,
+      )!,
       textColor: Color.lerp(textColor, other.textColor, t)!,
       activeIconColor: Color.lerp(activeIconColor, other.activeIconColor, t)!,
     );

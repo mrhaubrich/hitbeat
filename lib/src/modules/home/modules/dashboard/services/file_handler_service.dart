@@ -33,8 +33,9 @@ class FileHandlerService {
   Future<List<String>> pickFiles() async {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
-      allowedExtensions:
-          supportedExtensions.map((e) => e.substring(1)).toList(),
+      allowedExtensions: supportedExtensions
+          .map((e) => e.substring(1))
+          .toList(),
       allowMultiple: true,
       dialogTitle: 'Select audio files',
     );

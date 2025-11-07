@@ -15,9 +15,9 @@ class TrackBloc extends Bloc<TrackEvent, TrackBlocState> {
   TrackBloc({
     required TrackController controller,
     required IAudioPlayer player,
-  })  : _controller = controller,
-        _player = player,
-        super(const TrackInitial()) {
+  }) : _controller = controller,
+       _player = player,
+       super(const TrackInitial()) {
     on<TrackSubscriptionRequested>(_onSubscriptionRequested);
     on<TrackPlayPauseRequested>(_onPlayPauseRequested);
   }

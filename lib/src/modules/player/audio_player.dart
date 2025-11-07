@@ -13,18 +13,19 @@ import 'package:rxdart/rxdart.dart';
 class AudioPlayerJustAudio implements IAudioPlayer {
   /// {@macro audio_player}
   AudioPlayerJustAudio() {
+    // ignore
+    // ignore: discarded_futures
     _player = just_audio.AudioPlayer()..setVolume(1);
-    _playlist = just_audio.ConcatenatingAudioSource(children: []);
     _repeat = Repeat.none;
     _trackController = BehaviorSubject<Track?>();
     _timeController = BehaviorSubject<Duration>();
     _trackStateController = BehaviorSubject<TrackState>();
-    _initializePlayer();
+    unawaited(_initializePlayer());
 
     // Add listener for playback completion
     _playerStateController = _player.playerStateStream.listen((state) async {
       if (state.processingState == just_audio.ProcessingState.completed) {
-        final firstTrack = _playlist.sequence.firstOrNull?.tag as Track?;
+        final firstTrack = _player.sequence.firstOrNull?.tag as Track?;
         Future.delayed(const Duration(milliseconds: 500), () {
           _trackController.add(firstTrack);
           _timeController.add(Duration.zero);
@@ -39,7 +40,6 @@ class AudioPlayerJustAudio implements IAudioPlayer {
   }
 
   late final just_audio.AudioPlayer _player;
-  late final just_audio.ConcatenatingAudioSource _playlist;
   late final BehaviorSubject<Track?> _trackController;
   late final BehaviorSubject<Duration> _timeController;
   late final BehaviorSubject<TrackState> _trackStateController;
@@ -47,13 +47,13 @@ class AudioPlayerJustAudio implements IAudioPlayer {
   late Repeat _repeat;
 
   Future<void> _initializePlayer() async {
-    await _player.setAudioSource(_playlist);
+    await _player.setAudioSources([]);
     await _player.pause();
   }
 
   @override
   List<Track> get tracklist {
-    return _playlist.sequence.map((source) => source.tag as Track).toList();
+    return _player.sequence.map((source) => source.tag as Track).toList();
   }
 
   @override
@@ -68,7 +68,7 @@ class AudioPlayerJustAudio implements IAudioPlayer {
   @override
   Future<void> addTrack(Track newSong) {
     _trackController.add(newSong);
-    return _playlist.add(
+    return _player.addAudioSource(
       just_audio.AudioSource.uri(
         Uri.parse(newSong.path),
         tag: newSong,
@@ -79,8 +79,8 @@ class AudioPlayerJustAudio implements IAudioPlayer {
   @override
   Future<void> setTrack(Track newSong) async {
     _trackController.add(newSong);
-    await _playlist.clear();
-    await _playlist.add(
+    await _player.clearAudioSources();
+    await _player.addAudioSource(
       just_audio.AudioSource.uri(
         Uri.parse(newSong.path),
         tag: newSong,
@@ -90,17 +90,17 @@ class AudioPlayerJustAudio implements IAudioPlayer {
   }
 
   @override
-  void clearTracklist() {
-    _playlist.clear();
-    _player.stop();
+  Future<void> clearTracklist() async {
+    await _player.clearAudioSources();
+    await _player.stop();
   }
 
   @override
   Future<void> concatTracks(List<Track> songs) {
-    if (_playlist.sequence.isEmpty) {
+    if (_player.sequence.isEmpty) {
       _trackController.add(songs.firstOrNull);
     }
-    return _playlist.addAll(
+    return _player.addAudioSources(
       songs
           .map(
             (song) => just_audio.AudioSource.uri(
@@ -138,7 +138,7 @@ class AudioPlayerJustAudio implements IAudioPlayer {
   Track? get currentTrack {
     final index = _player.currentIndex;
     if (index != null) {
-      return _playlist.sequence.elementAtOrNull(index)?.tag as Track?;
+      return _player.sequence.elementAtOrNull(index)?.tag as Track?;
     }
     return null;
   }
@@ -205,14 +205,14 @@ class AudioPlayerJustAudio implements IAudioPlayer {
 
   @override
   Stream<Track?> get currentTrack$ => Rx.merge([
-        _player.currentIndexStream.map((index) {
-          if (index != null && index >= 0) {
-            return _playlist.sequence.elementAtOrNull(index)?.tag as Track?;
-          }
-          return null;
-        }),
-        _trackController.stream,
-      ]);
+    _player.currentIndexStream.map((index) {
+      if (index != null && index >= 0) {
+        return _player.sequence.elementAtOrNull(index)?.tag as Track?;
+      }
+      return null;
+    }),
+    _trackController.stream,
+  ]);
 
   @override
   Stream<double> get volume$ => _player.volumeStream;
@@ -225,15 +225,15 @@ class AudioPlayerJustAudio implements IAudioPlayer {
 
   @override
   Stream<Repeat> get repeat$ => _player.loopModeStream.map((mode) {
-        switch (mode) {
-          case just_audio.LoopMode.off:
-            return Repeat.none;
-          case just_audio.LoopMode.one:
-            return Repeat.one;
-          case just_audio.LoopMode.all:
-            return Repeat.all;
-        }
-      });
+    switch (mode) {
+      case just_audio.LoopMode.off:
+        return Repeat.none;
+      case just_audio.LoopMode.one:
+        return Repeat.one;
+      case just_audio.LoopMode.all:
+        return Repeat.all;
+    }
+  });
 
   @override
   Stream<bool> get shuffle$ => _player.shuffleModeEnabledStream;
@@ -241,15 +241,15 @@ class AudioPlayerJustAudio implements IAudioPlayer {
   @override
   Stream<List<Track>> get tracklist$ {
     return _player.sequenceStream.map((sequence) {
-      return sequence?.map((source) => source.tag as Track).toList() ?? [];
+      return sequence.map((source) => source.tag as Track).toList();
     });
   }
 
   @override
   Future<void> play(Track track, {List<Track>? tracklist}) async {
     if (tracklist != null) {
-      await _playlist.clear();
-      await _playlist.addAll(
+      await _player.clearAudioSources();
+      await _player.addAudioSources(
         tracklist
             .map(
               (song) => just_audio.AudioSource.uri(
@@ -260,19 +260,15 @@ class AudioPlayerJustAudio implements IAudioPlayer {
             .toList(),
       );
     }
-    final initialIndex =
-        _playlist.sequence.indexWhere((source) => source.tag == track);
+    final initialIndex = _player.sequence.indexWhere(
+      (source) => source.tag == track,
+    );
 
     _trackController.add(track); // Add this line to emit the track immediately
 
     await _player.setAudioSource(
-      just_audio.ConcatenatingAudioSource(
-        children: _playlist.sequence,
-        shuffleOrder: _player.shuffleModeEnabled
-            ? just_audio.DefaultShuffleOrder()
-            : null,
-      ),
-      initialIndex: initialIndex == -1 ? null : initialIndex,
+      _player.audioSource!,
+      initialIndex: initialIndex >= 0 ? initialIndex : 0,
     );
     await _player.play(); // Add this line to start playback immediately
   }

@@ -7,7 +7,7 @@ const accentCanvasColor = Color(0xFF3E3E61);
 const canvasColor = Color(0xFF2E2E48);
 
 /// The White color.
-const white = Colors.white;
+const Color white = Colors.white;
 
 /// The primary color of the application.
-final actionColor = const Color(0xFF5F5FA7).withValues(alpha: 0.6);
+final Color actionColor = const Color(0xFF5F5FA7).withValues(alpha: 0.6);

@@ -29,8 +29,10 @@ class TrackRepository {
     String? coverHash,
     int artistId,
   ) async {
-    final existingAlbum =
-        await _database.getAlbumByNameAndArtist(name, artistId);
+    final existingAlbum = await _database.getAlbumByNameAndArtist(
+      name,
+      artistId,
+    );
     if (existingAlbum != null) return existingAlbum.id;
 
     return _database.insertAlbum(

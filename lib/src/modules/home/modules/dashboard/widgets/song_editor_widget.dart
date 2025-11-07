@@ -68,20 +68,23 @@ class SongEditorWidget extends StatelessWidget {
                           const Text('Song ${-100}'),
                           TextFormField(
                             initialValue: 'song.name',
-                            decoration:
-                                const InputDecoration(labelText: 'Title'),
+                            decoration: const InputDecoration(
+                              labelText: 'Title',
+                            ),
                             onChanged: (_) {},
                           ),
                           TextFormField(
                             initialValue: 'song.artist.name',
-                            decoration:
-                                const InputDecoration(labelText: 'Artist'),
+                            decoration: const InputDecoration(
+                              labelText: 'Artist',
+                            ),
                             onChanged: (_) {},
                           ),
                           TextFormField(
                             initialValue: 'song.album.name',
-                            decoration:
-                                const InputDecoration(labelText: 'Album'),
+                            decoration: const InputDecoration(
+                              labelText: 'Album',
+                            ),
                             onChanged: (_) {},
                           ),
                         ],
@@ -131,28 +134,31 @@ class SongEditorWidget extends StatelessWidget {
                             Text('Song ${index + 1}'),
                             TextFormField(
                               initialValue: song.name,
-                              decoration:
-                                  const InputDecoration(labelText: 'Title'),
+                              decoration: const InputDecoration(
+                                labelText: 'Title',
+                              ),
                               onChanged: (value) =>
                                   songs[index] = song.copyWith(name: value),
                             ),
                             TextFormField(
                               initialValue: song.artist.name,
-                              decoration:
-                                  const InputDecoration(labelText: 'Artist'),
+                              decoration: const InputDecoration(
+                                labelText: 'Artist',
+                              ),
                               onChanged: (value) =>
                                   songs[index] = song.copyWith(
-                                artist: song.artist.copyWith(name: value),
-                              ),
+                                    artist: song.artist.copyWith(name: value),
+                                  ),
                             ),
                             TextFormField(
                               initialValue: song.album.name,
-                              decoration:
-                                  const InputDecoration(labelText: 'Album'),
+                              decoration: const InputDecoration(
+                                labelText: 'Album',
+                              ),
                               onChanged: (value) =>
                                   songs[index] = song.copyWith(
-                                album: song.album.copyWith(name: value),
-                              ),
+                                    album: song.album.copyWith(name: value),
+                                  ),
                             ),
                           ],
                         ),

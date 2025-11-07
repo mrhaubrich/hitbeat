@@ -167,10 +167,10 @@ class _SidebarItem extends SidebarXItem {
     super.label,
     dynamic Function()? onTap,
   }) : super(
-          onTap: () {
-            Modular.to.navigate(route);
-            if (onTap != null) onTap();
-          },
-        );
+         onTap: () {
+           Modular.to.navigate(route);
+           if (onTap != null) onTap();
+         },
+       );
   final String route;
 }

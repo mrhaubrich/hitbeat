@@ -31,14 +31,14 @@ class AlbumCover extends StatelessWidget {
     Color? backgroundColor,
     Widget placeholderIcon = const Icon(Icons.album, size: 32),
   }) : this._(
-          key: key,
-          imageUrl: url,
-          size: size,
-          padding: padding,
-          borderRadius: borderRadius,
-          backgroundColor: backgroundColor,
-          placeholderIcon: placeholderIcon,
-        );
+         key: key,
+         imageUrl: url,
+         size: size,
+         padding: padding,
+         borderRadius: borderRadius,
+         backgroundColor: backgroundColor,
+         placeholderIcon: placeholderIcon,
+       );
 
   /// Creates an album cover from a local file
   const AlbumCover.file({
@@ -50,14 +50,14 @@ class AlbumCover extends StatelessWidget {
     Color? backgroundColor,
     Widget placeholderIcon = const Icon(Icons.album, size: 32),
   }) : this._(
-          key: key,
-          imageFile: file,
-          size: size,
-          padding: padding,
-          borderRadius: borderRadius,
-          backgroundColor: backgroundColor,
-          placeholderIcon: placeholderIcon,
-        );
+         key: key,
+         imageFile: file,
+         size: size,
+         padding: padding,
+         borderRadius: borderRadius,
+         backgroundColor: backgroundColor,
+         placeholderIcon: placeholderIcon,
+       );
 
   /// Creates an album cover from memory (bytes)
   const AlbumCover.memory({
@@ -69,14 +69,14 @@ class AlbumCover extends StatelessWidget {
     Color? backgroundColor,
     Widget placeholderIcon = const Icon(Icons.album, size: 32),
   }) : this._(
-          key: key,
-          imageBytes: bytes,
-          size: size,
-          padding: padding,
-          borderRadius: borderRadius,
-          backgroundColor: backgroundColor,
-          placeholderIcon: placeholderIcon,
-        );
+         key: key,
+         imageBytes: bytes,
+         size: size,
+         padding: padding,
+         borderRadius: borderRadius,
+         backgroundColor: backgroundColor,
+         placeholderIcon: placeholderIcon,
+       );
 
   /// Creates an album cover from an asset
   const AlbumCover.asset({
@@ -88,14 +88,14 @@ class AlbumCover extends StatelessWidget {
     Color? backgroundColor,
     Widget placeholderIcon = const Icon(Icons.album, size: 32),
   }) : this._(
-          key: key,
-          assetPath: path,
-          size: size,
-          padding: padding,
-          borderRadius: borderRadius,
-          backgroundColor: backgroundColor,
-          placeholderIcon: placeholderIcon,
-        );
+         key: key,
+         assetPath: path,
+         size: size,
+         padding: padding,
+         borderRadius: borderRadius,
+         backgroundColor: backgroundColor,
+         placeholderIcon: placeholderIcon,
+       );
 
   /// The URL of the image to display.
   final String? imageUrl;
