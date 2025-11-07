@@ -212,7 +212,7 @@ class AudioPlayerJustAudio implements IAudioPlayer {
       return null;
     }),
     _trackController.stream,
-  ]);
+  ]).distinct((previous, next) => previous == next);
 
   @override
   Stream<double> get volume$ => _player.volumeStream;

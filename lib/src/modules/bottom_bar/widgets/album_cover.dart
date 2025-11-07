@@ -168,6 +168,8 @@ class _Image extends StatelessWidget {
       return CachedNetworkImage(
         imageUrl: imageUrl!,
         useOldImageOnUrlChange: true,
+        fadeInDuration: Duration.zero,
+        fadeOutDuration: Duration.zero,
         fit: BoxFit.cover,
         placeholder: (context, url) => const Center(
           child: CircularProgressIndicator(),
@@ -180,6 +182,7 @@ class _Image extends StatelessWidget {
       return Image.file(
         imageFile!,
         fit: BoxFit.cover,
+        gaplessPlayback: true,
         errorBuilder: (context, error, stackTrace) => placeholderIcon,
       );
     }
@@ -188,6 +191,7 @@ class _Image extends StatelessWidget {
       return Image.memory(
         imageBytes!,
         fit: BoxFit.cover,
+        gaplessPlayback: true,
         errorBuilder: (context, error, stackTrace) => placeholderIcon,
       );
     }
@@ -196,6 +200,7 @@ class _Image extends StatelessWidget {
       return Image.asset(
         assetPath!,
         fit: BoxFit.cover,
+        gaplessPlayback: true,
         errorBuilder: (context, error, stackTrace) => placeholderIcon,
       );
     }

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:hitbeat/src/modules/bottom_bar/widgets/album_cover.dart';
@@ -6,6 +8,7 @@ import 'package:hitbeat/src/modules/bottom_bar/widgets/track_info.dart';
 import 'package:hitbeat/src/modules/bottom_bar/widgets/volume_control.dart';
 import 'package:hitbeat/src/modules/player/interfaces/player.dart';
 import 'package:hitbeat/src/modules/player/models/track.dart';
+import 'package:hitbeat/src/services/cover_cache_service.dart';
 
 /// The height of the bottom bar.
 const kBottomBarHeight = 80.0;
@@ -62,16 +65,22 @@ class _BottomBarState extends State<BottomBar> {
                       children: [
                         AnimatedCrossFade(
                           duration: const Duration(milliseconds: 300),
-                          firstChild: const AlbumCover.asset(
+                          firstChild: const AlbumCover.network(
                             key: ValueKey(kNoAlbumCover),
-                            path: kNoAlbumCover,
+                            url: kNoAlbumCover,
                           ),
-                          secondChild: snapshot.data?.album.cover != null
-                              ? AlbumCover.memory(
-                                  key: ValueKey(snapshot.data!.album.coverHash),
-                                  bytes: snapshot.data!.album.cover!,
-                                )
-                              : const SizedBox(),
+                          secondChild: () {
+                            final coverHash = snapshot.data?.album.coverHash;
+                            final coverPath = Modular.get<CoverCacheService>()
+                                .getCoverPath(coverHash);
+                            if (coverPath != null) {
+                              return AlbumCover.file(
+                                key: ValueKey(coverHash),
+                                file: File(coverPath),
+                              );
+                            }
+                            return const SizedBox();
+                          }(),
                           crossFadeState: snapshot.data?.album.cover == null
                               ? CrossFadeState.showFirst
                               : CrossFadeState.showSecond,
