@@ -1,7 +1,10 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_modular/flutter_modular.dart';
 import 'package:hitbeat/src/modules/player/models/track.dart';
+import 'package:hitbeat/src/services/cover_cache_service.dart';
 
 /// {@template song_editor_widget}
 /// A widget that allows the user to edit the information of a list of songs.
@@ -109,14 +112,19 @@ class SongEditorWidget extends StatelessWidget {
                         height: 120,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(8),
-                          image: song.album.cover != null
-                              ? DecorationImage(
-                                  image: MemoryImage(song.album.cover!),
-                                  fit: BoxFit.cover,
-                                )
-                              : null,
+                          image: () {
+                            final hash = song.album.coverHash;
+                            if (hash == null) return null;
+                            final path = Modular.get<CoverCacheService>()
+                                .getCoverPath(hash);
+                            if (path == null) return null;
+                            return DecorationImage(
+                              image: FileImage(File(path)),
+                              fit: BoxFit.cover,
+                            );
+                          }(),
                         ),
-                        child: song.album.cover == null
+                        child: song.album.coverHash == null
                             ? const Center(
                                 child: Icon(
                                   Icons.album,

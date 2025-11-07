@@ -17,13 +17,10 @@ class MetadataExtractor implements IMetadataExtractor {
   /// {@macro metadata_extractor}
   MetadataExtractor(this._coverCache);
 
-  AudioMetadata? _metadata;
   final CoverCacheService _coverCache;
 
   @override
-  void dispose() {
-    _metadata = null;
-  }
+  void dispose() {}
 
   AudioMetadata _readMetadata(String path) {
     final file = File(path);
@@ -33,25 +30,24 @@ class MetadataExtractor implements IMetadataExtractor {
     return metadata;
   }
 
-  Uint8List? _extractCoverArt() {
-    final coverFront = _metadata!.pictures.firstWhereOrNull(
+  Uint8List? _extractCoverArt(AudioMetadata metadata) {
+    final coverFront = metadata.pictures.firstWhereOrNull(
       (element) => element.pictureType == PictureType.coverFront,
     );
 
-    return coverFront?.bytes ?? _metadata!.pictures.firstOrNull?.bytes;
+    return coverFront?.bytes ?? metadata.pictures.firstOrNull?.bytes;
   }
 
   @override
   Uint8List? extractCoverArt(String path) {
-    _metadata ??= _readMetadata(path);
-
-    return _extractCoverArt();
+    final metadata = _readMetadata(path);
+    return _extractCoverArt(metadata);
   }
 
-  Artist _extractArtist() {
+  Artist _extractArtist(AudioMetadata metadata) {
     return Artist(
-      name: _metadata!.artist ?? 'Unknown',
-      image: _metadata!.pictures
+      name: metadata.artist ?? 'Unknown',
+      image: metadata.pictures
           .firstWhereOrNull(
             (element) => element.pictureType == PictureType.artistPerformer,
           )
@@ -60,20 +56,20 @@ class MetadataExtractor implements IMetadataExtractor {
     );
   }
 
-  Album _extractAlbum() {
-    final coverData = _extractCoverArt();
+  Album _extractAlbum(AudioMetadata metadata) {
+    final coverData = _extractCoverArt(metadata);
     final coverHash = _coverCache.storeCover(coverData);
 
     return Album(
-      name: _metadata!.album ?? 'Unknown',
-      artist: _extractArtist(),
+      name: metadata.album ?? 'Unknown',
+      artist: _extractArtist(metadata),
       coverHash: coverHash,
       tracks: const [],
     );
   }
 
-  List<Genre> _extractGenres() {
-    return _metadata!.genres
+  List<Genre> _extractGenres(AudioMetadata metadata) {
+    return metadata.genres
         .map(
           (e) => Genre(
             name: e,
@@ -84,40 +80,41 @@ class MetadataExtractor implements IMetadataExtractor {
 
   @override
   Future<Track> extractTrack(String path) async {
-    _metadata ??= _readMetadata(path);
+    final metadata = _readMetadata(path);
 
-    if (_metadata == null) {
-      throw Exception('Failed to read metadata');
-    }
-
-    if (_metadata!.duration == null) {
+    if (metadata.duration == null) {
       throw Exception('Failed to read duration');
     }
 
     final track = Track(
-      name: _metadata!.title ?? 'Unknown',
-      album: _extractAlbum(),
-      artist: _extractArtist(),
-      duration: _metadata!.duration!,
+      name: metadata.title ?? 'Unknown',
+      album: _extractAlbum(metadata),
+      artist: _extractArtist(metadata),
+      duration: metadata.duration!,
       path: 'file:///$path',
-      genres: _extractGenres(),
+      genres: _extractGenres(metadata),
     );
-
-    _metadata = null;
 
     return track;
   }
 
   @override
   Future<List<Track>> extractTracks(List<String> paths) async {
-    // asyncronously extract metadata from each file
+    // Limit concurrency to avoid UI starvation and reduce memory pressure.
+    const poolSize = 3;
+    final results = List<Track?>.filled(paths.length, null);
+    var index = 0;
 
-    final tracks = await Future.wait(
-      paths.map(
-        extractTrack,
-      ),
-    );
+    Future<void> worker() async {
+      while (true) {
+        final current = index++;
+        if (current >= paths.length) break;
+        final p = paths[current];
+        results[current] = await extractTrack(p);
+      }
+    }
 
-    return tracks;
+    await Future.wait(List.generate(poolSize, (_) => worker()));
+    return results.whereType<Track>().toList();
   }
 }

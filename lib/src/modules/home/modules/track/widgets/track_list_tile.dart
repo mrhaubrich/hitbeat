@@ -1,8 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_modular/flutter_modular.dart';
 import 'package:hitbeat/src/modules/home/modules/track/widgets/animated_play_pause_button.dart';
 import 'package:hitbeat/src/modules/player/enums/track_state.dart';
 import 'package:hitbeat/src/modules/player/interfaces/player.dart';
 import 'package:hitbeat/src/modules/player/models/track.dart';
+import 'package:hitbeat/src/services/cover_cache_service.dart';
 
 /// {@template track_list_tile}
 /// A list tile for a track.
@@ -45,13 +49,7 @@ class TrackListTile extends StatelessWidget {
       child: ListTile(
         key: ValueKey(track.path),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        leading: CircleAvatar(
-          backgroundImage: track.album.cover != null
-              ? MemoryImage(track.album.cover!)
-              : null,
-          radius: 24,
-          child: track.album.cover == null ? const Icon(Icons.album) : null,
-        ),
+        leading: _AlbumAvatar(track: track),
         title: StreamBuilder<TrackState>(
           stream: player.trackState$,
           builder: (context, snapshot) {
@@ -105,6 +103,38 @@ class TrackListTile extends StatelessWidget {
             },
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _AlbumAvatar extends StatelessWidget {
+  const _AlbumAvatar({required this.track});
+
+  final Track track;
+
+  @override
+  Widget build(BuildContext context) {
+    final coverHash = track.album.coverHash;
+    if (coverHash == null) {
+      return const CircleAvatar(
+        radius: 24,
+        child: Icon(Icons.album),
+      );
+    }
+    final cache = Modular.get<CoverCacheService>();
+    final path = cache.getCoverPath(coverHash);
+    if (path == null) {
+      return const CircleAvatar(
+        radius: 24,
+        child: Icon(Icons.album),
+      );
+    }
+    final file = File(path);
+    return CircleAvatar(
+      radius: 24,
+      backgroundImage: FileImage(
+        file,
       ),
     );
   }

@@ -29,6 +29,22 @@ class FileHandlerService {
     return audioFiles;
   }
 
+  /// Gets all audio files from the given directory asynchronously, avoiding UI blocking.
+  Future<List<String>> getAudioFilesFromDirectoryAsync(String dirPath) async {
+    final dir = Directory(dirPath);
+    final audioFiles = <String>[];
+
+    if (!await dir.exists()) return audioFiles;
+
+    await for (final entity in dir.list(recursive: true, followLinks: false)) {
+      if (entity is File && isAudioFile(entity.path)) {
+        audioFiles.add(entity.path);
+      }
+    }
+
+    return audioFiles;
+  }
+
   /// Picks audio files from the device.
   Future<List<String>> pickFiles() async {
     final result = await FilePicker.platform.pickFiles(
@@ -45,8 +61,8 @@ class FileHandlerService {
     final allPaths = <String>[];
     for (final file in result.files) {
       final path = file.path!;
-      if (FileSystemEntity.isDirectorySync(path)) {
-        allPaths.addAll(getAudioFilesFromDirectory(path));
+      if (await FileSystemEntity.isDirectory(path)) {
+        allPaths.addAll(await getAudioFilesFromDirectoryAsync(path));
       } else {
         allPaths.add(path);
       }
@@ -63,8 +79,8 @@ class FileHandlerService {
       if (uri == null) continue;
       final path = uri.toFilePath();
 
-      if (FileSystemEntity.isDirectorySync(path)) {
-        allPaths.addAll(getAudioFilesFromDirectory(path));
+      if (await FileSystemEntity.isDirectory(path)) {
+        allPaths.addAll(await getAudioFilesFromDirectoryAsync(path));
       } else if (isAudioFile(path)) {
         allPaths.add(path);
       }
