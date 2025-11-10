@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:hitbeat/src/modules/home/modules/track/blocs/track_bloc.dart';
-import 'package:hitbeat/src/modules/home/modules/track/widgets/track_list_tile.dart';
+import 'package:hitbeat/src/modules/home/modules/track/widgets/track_list_tile_enhanced.dart';
 import 'package:hitbeat/src/modules/player/enums/track_state.dart';
 import 'package:hitbeat/src/modules/player/interfaces/player.dart';
 import 'package:hitbeat/src/modules/player/models/track.dart';
@@ -37,6 +37,7 @@ class _TrackPageState extends State<TrackPage> {
   late final TrackBloc _bloc = Modular.get<TrackBloc>();
   final IAudioPlayer _player = Modular.get<IAudioPlayer>();
   final TextEditingController _searchController = TextEditingController();
+  final FocusNode _searchFocusNode = FocusNode();
   String _searchQuery = '';
   _SortOption _sortOption = _SortOption.nameAsc;
 
@@ -54,6 +55,7 @@ class _TrackPageState extends State<TrackPage> {
   @override
   void dispose() {
     _searchController.dispose();
+    _searchFocusNode.dispose();
     super.dispose();
   }
 
@@ -123,26 +125,46 @@ class _TrackPageState extends State<TrackPage> {
               children: [
                 // Search field
                 Expanded(
-                  child: TextField(
-                    controller: _searchController,
-                    decoration: InputDecoration(
-                      hintText: 'Search tracks, artists, or albums...',
-                      prefixIcon: const Icon(Icons.search),
-                      suffixIcon: _searchQuery.isNotEmpty
-                          ? IconButton(
-                              icon: const Icon(Icons.clear),
-                              onPressed: _searchController.clear,
-                            )
-                          : null,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
-                      filled: true,
-                      fillColor: theme.cardColor,
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
+                  child: Focus(
+                    onFocusChange: (focused) => setState(() {}),
+                    child: TextField(
+                      controller: _searchController,
+                      focusNode: _searchFocusNode,
+                      decoration: InputDecoration(
+                        hintText: 'Search songs, artists, or albums…',
+                        hintStyle: TextStyle(color: Colors.grey[500]),
+                        prefixIcon: Icon(
+                          Icons.search,
+                          color: _searchFocusNode.hasFocus
+                              ? theme.primaryColor
+                              : Colors.grey[500],
+                        ),
+                        suffixIcon: _searchQuery.isNotEmpty
+                            ? IconButton(
+                                icon: const Icon(Icons.clear),
+                                onPressed: _searchController.clear,
+                                tooltip: 'Clear search',
+                              )
+                            : null,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(
+                            color: theme.primaryColor.withAlpha(128),
+                            width: 2,
+                          ),
+                        ),
+                        filled: true,
+                        fillColor: _searchFocusNode.hasFocus
+                            ? theme.cardColor.withAlpha(255)
+                            : theme.cardColor,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 14,
+                        ),
                       ),
                     ),
                   ),
@@ -306,7 +328,7 @@ class _TrackPageState extends State<TrackPage> {
                         itemBuilder: (context, index) {
                           final track = filteredTracks[index];
 
-                          return TrackListTile(
+                          return TrackListTileEnhanced(
                             track: track,
                             player: _player,
                             trackNumber: index + 1,
