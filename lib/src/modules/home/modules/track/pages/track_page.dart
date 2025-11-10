@@ -52,9 +52,9 @@ class _TrackPageState extends State<TrackPage> {
   }
 
   void _onSearchChanged() {
-    // Debounce search to avoid lag on rapid typing
+    // Debounce search to avoid lag on rapid typing (250ms optimal)
     _debounceTimer?.cancel();
-    _debounceTimer = Timer(const Duration(milliseconds: 300), () {
+    _debounceTimer = Timer(const Duration(milliseconds: 250), () {
       if (mounted) {
         setState(() {
           _searchQuery = _searchController.text.toLowerCase();
@@ -121,15 +121,20 @@ class _TrackPageState extends State<TrackPage> {
       body: FocusScope(
         child: Column(
           children: [
-            // Search and sort bar
+            // Search and sort bar with enhanced visual separation
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.fromLTRB(20, 18, 20, 18),
               decoration: BoxDecoration(
-                color: theme.scaffoldBackgroundColor,
+                color: theme.scaffoldBackgroundColor.withAlpha(250),
+                border: Border(
+                  bottom: BorderSide(
+                    color: theme.primaryColor.withAlpha(26),
+                  ),
+                ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withAlpha(25),
-                    blurRadius: 4,
+                    color: Colors.black.withAlpha(38),
+                    blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
                 ],
@@ -140,43 +145,63 @@ class _TrackPageState extends State<TrackPage> {
                   Expanded(
                     child: Focus(
                       onFocusChange: (focused) => setState(() {}),
-                      child: TextField(
-                        controller: _searchController,
-                        focusNode: _searchFocusNode,
-                        decoration: InputDecoration(
-                          hintText: 'Search songs, artists, or albums…',
-                          hintStyle: TextStyle(color: Colors.grey[500]),
-                          prefixIcon: Icon(
-                            Icons.search,
-                            color: _searchFocusNode.hasFocus
-                                ? theme.primaryColor
-                                : Colors.grey[500],
-                          ),
-                          suffixIcon: _searchQuery.isNotEmpty
-                              ? IconButton(
-                                  icon: const Icon(Icons.clear),
-                                  onPressed: _searchController.clear,
-                                  tooltip: 'Clear search',
-                                )
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: _searchFocusNode.hasFocus
+                              ? [
+                                  BoxShadow(
+                                    color: theme.primaryColor.withAlpha(77),
+                                    blurRadius: 12,
+                                  ),
+                                ]
                               : null,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide.none,
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(
-                              color: theme.primaryColor.withAlpha(128),
-                              width: 2,
+                        ),
+                        child: TextField(
+                          controller: _searchController,
+                          focusNode: _searchFocusNode,
+                          decoration: InputDecoration(
+                            hintText: 'Find something to play…',
+                            hintStyle: TextStyle(
+                              color: Colors.grey[500],
+                              fontWeight: FontWeight.w400,
                             ),
-                          ),
-                          filled: true,
-                          fillColor: _searchFocusNode.hasFocus
-                              ? theme.cardColor.withAlpha(255)
-                              : theme.cardColor,
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 14,
+                            prefixIcon: AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              child: Icon(
+                                Icons.search,
+                                color: _searchFocusNode.hasFocus
+                                    ? theme.primaryColor
+                                    : Colors.grey[500],
+                              ),
+                            ),
+                            suffixIcon: _searchQuery.isNotEmpty
+                                ? IconButton(
+                                    icon: const Icon(Icons.clear),
+                                    onPressed: _searchController.clear,
+                                    tooltip: 'Clear search',
+                                  )
+                                : null,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color: theme.primaryColor.withAlpha(153),
+                                width: 2,
+                              ),
+                            ),
+                            filled: true,
+                            fillColor: _searchFocusNode.hasFocus
+                                ? theme.cardColor.withAlpha(255)
+                                : theme.cardColor.withAlpha(230),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 14,
+                            ),
                           ),
                         ),
                       ),
@@ -430,34 +455,50 @@ class _TrackPageState extends State<TrackPage> {
 
                   return Column(
                     children: [
-                      // Track count header with better visual design
+                      // Track count header with refined spacing and visual rhythm
                       Container(
-                        padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
+                        padding: const EdgeInsets.fromLTRB(20, 18, 20, 14),
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: [
-                              theme.scaffoldBackgroundColor,
+                              theme.scaffoldBackgroundColor.withAlpha(242),
                               theme.scaffoldBackgroundColor.withAlpha(0),
                             ],
                             begin: Alignment.topCenter,
                             end: Alignment.bottomCenter,
+                            stops: const [0.0, 1.0],
+                          ),
+                          border: const Border(
+                            bottom: BorderSide(
+                              color: Colors.transparent,
+                              width: 0,
+                            ),
                           ),
                         ),
                         child: Row(
                           children: [
                             Icon(
-                              Icons.music_note,
-                              size: 16,
-                              color: Colors.grey[500],
+                              Icons.music_note_outlined,
+                              size: 15,
+                              color: Colors.grey[600],
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              '${filteredTracks.length} ${filteredTracks.length == 1 ? 'track' : 'tracks'}',
+                              '${filteredTracks.length}',
                               style: TextStyle(
                                 color: Colors.grey[300],
-                                fontSize: 14,
+                                fontSize: 13,
                                 fontWeight: FontWeight.w600,
-                                letterSpacing: 0.3,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              filteredTracks.length == 1 ? 'track' : 'tracks',
+                              style: TextStyle(
+                                color: Colors.grey[500],
+                                fontSize: 13,
+                                fontWeight: FontWeight.w400,
                               ),
                             ),
                             if (_searchQuery.isNotEmpty) ...[
@@ -511,45 +552,78 @@ class _TrackPageState extends State<TrackPage> {
                           ],
                         ),
                       ),
-                      // Track list
+                      // Track list with staggered fade-in animation
                       Expanded(
-                        child: ListView.builder(
-                          padding: const EdgeInsets.only(bottom: 16),
-                          itemCount: filteredTracks.length,
-                          itemBuilder: (context, index) {
-                            final track = filteredTracks[index];
+                        child: ShaderMask(
+                          shaderCallback: (Rect bounds) {
+                            return const LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                Colors.transparent,
+                                Colors.white,
+                                Colors.white,
+                                Colors.transparent,
+                              ],
+                              stops: [0.0, 0.02, 0.95, 1.0],
+                            ).createShader(bounds);
+                          },
+                          blendMode: BlendMode.dstIn,
+                          child: ListView.builder(
+                            padding: const EdgeInsets.only(
+                              top: 8,
+                              bottom: 24,
+                            ),
+                            itemCount: filteredTracks.length,
+                            itemBuilder: (context, index) {
+                              final track = filteredTracks[index];
 
-                            return AnimatedSwitcher(
-                              duration: const Duration(milliseconds: 200),
-                              child: TrackListTileEnhanced(
-                                key: ValueKey(track.path),
-                                track: track,
-                                player: _player,
-                                trackNumber: index + 1,
-                                onTap: () {
-                                  final trackState = _player.trackState;
-                                  final currentTrack = _player.currentTrack;
-                                  final isCurrentTrack =
-                                      currentTrack?.path == track.path;
-
-                                  final trackPlaybackState = isCurrentTrack
-                                      ? trackState
-                                      : TrackState.notPlaying;
-
-                                  _bloc.add(
-                                    TrackPlayPauseRequested(
-                                      track: track,
-                                      tracklist: filteredTracks,
-                                      isCurrentTrack: isCurrentTrack,
-                                      shouldPlay:
-                                          trackPlaybackState !=
-                                          TrackState.playing,
+                              return TweenAnimationBuilder<double>(
+                                duration: Duration(
+                                  milliseconds:
+                                      200 + (index * 30).clamp(0, 400),
+                                ),
+                                curve: Curves.easeOutCubic,
+                                tween: Tween(begin: 0, end: 1),
+                                builder: (context, value, child) {
+                                  return Opacity(
+                                    opacity: value,
+                                    child: Transform.translate(
+                                      offset: Offset(0, 20 * (1 - value)),
+                                      child: child,
                                     ),
                                   );
                                 },
-                              ),
-                            );
-                          },
+                                child: TrackListTileEnhanced(
+                                  key: ValueKey(track.path),
+                                  track: track,
+                                  player: _player,
+                                  trackNumber: index + 1,
+                                  onTap: () {
+                                    final trackState = _player.trackState;
+                                    final currentTrack = _player.currentTrack;
+                                    final isCurrentTrack =
+                                        currentTrack?.path == track.path;
+
+                                    final trackPlaybackState = isCurrentTrack
+                                        ? trackState
+                                        : TrackState.notPlaying;
+
+                                    _bloc.add(
+                                      TrackPlayPauseRequested(
+                                        track: track,
+                                        tracklist: filteredTracks,
+                                        isCurrentTrack: isCurrentTrack,
+                                        shouldPlay:
+                                            trackPlaybackState !=
+                                            TrackState.playing,
+                                      ),
+                                    );
+                                  },
+                                ),
+                              );
+                            },
+                          ),
                         ),
                       ),
                     ],
