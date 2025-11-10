@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:hitbeat/src/modules/player/enums/track_state.dart';
 
@@ -57,9 +59,9 @@ class _AnimatedPlayPauseButtonState extends State<AnimatedPlayPauseButton>
 
   void _updateControllerValue() {
     if (widget.state == TrackState.playing) {
-      _controller.forward();
+      unawaited(_controller.forward());
     } else {
-      _controller.reverse();
+      unawaited(_controller.reverse());
     }
   }
 

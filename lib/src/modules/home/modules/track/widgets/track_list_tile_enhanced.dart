@@ -1,16 +1,22 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_modular/flutter_modular.dart';
-import 'package:hitbeat/src/modules/home/modules/track/widgets/animated_play_pause_button.dart';
+import 'package:hitbeat/src/modules/home/modules/track/widgets/track_tile_components/track_tile_container.dart';
+import 'package:hitbeat/src/modules/home/modules/track/widgets/track_tile_components/track_tile_content.dart';
 import 'package:hitbeat/src/modules/player/enums/track_state.dart';
 import 'package:hitbeat/src/modules/player/interfaces/player.dart';
 import 'package:hitbeat/src/modules/player/models/track.dart';
-import 'package:hitbeat/src/services/cover_cache_service.dart';
 
 /// {@template track_list_tile}
 /// An enhanced list tile for a track with desktop-optimized UX.
+///
+/// This is the main orchestration widget that handles:
+/// - Hover and press animations
+/// - Stream listening for track state
+/// - Composition of sub-components
+///
+/// The visual components are split into separate files in the
+/// `track_tile_components/` directory for better maintainability.
 /// {@endtemplate}
 class TrackListTileEnhanced extends StatefulWidget {
   /// {@macro track_list_tile}
@@ -72,16 +78,8 @@ class _TrackListTileEnhancedState extends State<TrackListTileEnhanced>
     }
   }
 
-  String _formatDuration(Duration duration) {
-    final minutes = duration.inMinutes;
-    final seconds = duration.inSeconds % 60;
-    return '$minutes:${seconds.toString().padLeft(2, '0')}';
-  }
-
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return MouseRegion(
       onEnter: (_) => _onHoverChanged(true),
       onExit: (_) => _onHoverChanged(false),
@@ -93,350 +91,41 @@ class _TrackListTileEnhancedState extends State<TrackListTileEnhanced>
           curve: Curves.easeOut,
           child: Transform.scale(
             scale: _scaleAnimation.value,
-            child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 3),
-              decoration: BoxDecoration(
-                color: _isHovered
-                    ? theme.cardColor.withAlpha(245)
-                    : theme.cardColor,
-                borderRadius: BorderRadius.circular(8),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withAlpha(_isHovered ? 55 : 28),
-                    blurRadius: _isHovered ? 18 : 8,
-                    offset: Offset(0, _isHovered ? 8 : 3),
-                    spreadRadius: _isHovered ? 1 : 0,
-                  ),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: StreamBuilder<Track?>(
-                  stream: widget.player.currentTrack$,
-                  builder: (context, currentTrackSnapshot) {
-                    return StreamBuilder<TrackState>(
-                      stream: widget.player.trackState$,
-                      builder: (context, trackStateSnapshot) {
-                        final trackState =
-                            trackStateSnapshot.data ?? TrackState.notPlaying;
-                        final isCurrentTrack =
-                            currentTrackSnapshot.data == widget.track;
-                        final isPlaying =
-                            isCurrentTrack && trackState == TrackState.playing;
+            child: TrackTileContainer(
+              isHovered: _isHovered,
+              child: StreamBuilder<Track?>(
+                stream: widget.player.currentTrack$,
+                builder: (context, currentTrackSnapshot) {
+                  return StreamBuilder<TrackState>(
+                    stream: widget.player.trackState$,
+                    builder: (context, trackStateSnapshot) {
+                      final trackState =
+                          trackStateSnapshot.data ?? TrackState.notPlaying;
+                      final isCurrentTrack =
+                          currentTrackSnapshot.data == widget.track;
+                      final isPlaying =
+                          isCurrentTrack && trackState == TrackState.playing;
 
-                        return AnimatedContainer(
-                          duration: const Duration(milliseconds: 250),
-                          curve: Curves.easeOutCubic,
-                          decoration: BoxDecoration(
-                            border: Border(
-                              left: BorderSide(
-                                color: isCurrentTrack
-                                    ? theme.primaryColor
-                                    : Colors.transparent,
-                                width: 4,
-                              ),
-                            ),
-                            gradient: isCurrentTrack
-                                ? LinearGradient(
-                                    colors: [
-                                      theme.primaryColor.withAlpha(30),
-                                      Colors.transparent,
-                                    ],
-                                    stops: const [0.0, 0.6],
-                                  )
-                                : null,
-                          ),
-                          child: Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              onTap: widget.onTap,
-                              onTapDown: (_) =>
-                                  setState(() => _isPressed = true),
-                              onTapUp: (_) =>
-                                  setState(() => _isPressed = false),
-                              onTapCancel: () =>
-                                  setState(() => _isPressed = false),
-                              borderRadius: BorderRadius.circular(8),
-                              hoverColor: theme.primaryColor.withAlpha(10),
-                              splashColor: theme.primaryColor.withAlpha(40),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 12,
-                                ),
-                                child: Row(
-                                  children: [
-                                    // Track number or playing indicator
-                                    SizedBox(
-                                      width: 40,
-                                      child: Center(
-                                        child: AnimatedSwitcher(
-                                          duration: const Duration(
-                                            milliseconds: 200,
-                                          ),
-                                          child: isPlaying
-                                              ? Icon(
-                                                  Icons.graphic_eq,
-                                                  key: const ValueKey(
-                                                    'playing',
-                                                  ),
-                                                  color: theme.primaryColor,
-                                                  size: 22,
-                                                )
-                                              : widget.trackNumber != null
-                                              ? Text(
-                                                  '${widget.trackNumber}',
-                                                  key: ValueKey(
-                                                    'number-${widget.trackNumber}',
-                                                  ),
-                                                  style: TextStyle(
-                                                    color: isCurrentTrack
-                                                        ? theme.primaryColor
-                                                        : Colors.grey[500],
-                                                    fontSize: 15,
-                                                    fontWeight: isCurrentTrack
-                                                        ? FontWeight.w700
-                                                        : FontWeight.w500,
-                                                    letterSpacing: 0.5,
-                                                  ),
-                                                )
-                                              : const SizedBox.shrink(
-                                                  key: ValueKey('empty'),
-                                                ),
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 14),
-                                    // Album cover with hover animation
-                                    AnimatedScale(
-                                      duration: const Duration(
-                                        milliseconds: 150,
-                                      ),
-                                      scale: _isHovered ? 1.05 : 1.0,
-                                      child: _AlbumAvatar(
-                                        track: widget.track,
-                                        isPlaying: isPlaying,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 18),
-                                    // Track info
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Text(
-                                            widget.track.name,
-                                            style: TextStyle(
-                                              color: isCurrentTrack
-                                                  ? theme.primaryColor
-                                                  : Colors.white,
-                                              fontWeight: isCurrentTrack
-                                                  ? FontWeight.w700
-                                                  : FontWeight.w600,
-                                              fontSize: 15,
-                                              letterSpacing: 0.2,
-                                            ),
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                          const SizedBox(height: 5),
-                                          Text(
-                                            [
-                                              widget.track.artist.name,
-                                              if (widget
-                                                  .track
-                                                  .album
-                                                  .name
-                                                  .isNotEmpty)
-                                                widget.track.album.name,
-                                            ].join(' • '),
-                                            style: TextStyle(
-                                              color: isCurrentTrack
-                                                  ? theme.primaryColor
-                                                        .withAlpha(
-                                                          190,
-                                                        )
-                                                  : Colors.grey[400],
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.w400,
-                                              letterSpacing: 0.1,
-                                            ),
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    const SizedBox(width: 18),
-                                    // Duration
-                                    Text(
-                                      _formatDuration(widget.track.duration),
-                                      style: TextStyle(
-                                        color: isCurrentTrack
-                                            ? theme.primaryColor.withAlpha(190)
-                                            : Colors.grey[500],
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 18),
-                                    // Play/Pause button with animation
-                                    RepaintBoundary(
-                                      child: AnimatedScale(
-                                        duration: const Duration(
-                                          milliseconds: 150,
-                                        ),
-                                        scale: _isHovered ? 1.1 : 1.0,
-                                        child: AnimatedPlayPauseButton(
-                                          state: isCurrentTrack
-                                              ? trackState
-                                              : TrackState.notPlaying,
-                                          onPressed: widget.onTap,
-                                          color: isCurrentTrack
-                                              ? theme.primaryColor
-                                              : null,
-                                          filled: isCurrentTrack,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                    );
-                  },
-                ),
+                      return TrackTileContent(
+                        track: widget.track,
+                        trackNumber: widget.trackNumber,
+                        isCurrentTrack: isCurrentTrack,
+                        isPlaying: isPlaying,
+                        trackState: trackState,
+                        isHovered: _isHovered,
+                        onTap: widget.onTap,
+                        onTapDown: () => setState(() => _isPressed = true),
+                        onTapUp: () => setState(() => _isPressed = false),
+                        onTapCancel: () => setState(() => _isPressed = false),
+                      );
+                    },
+                  );
+                },
               ),
             ),
           ),
         ),
       ),
-    );
-  }
-}
-
-class _AlbumAvatar extends StatefulWidget {
-  const _AlbumAvatar({
-    required this.track,
-    this.isPlaying = false,
-  });
-
-  final Track track;
-  final bool isPlaying;
-
-  @override
-  State<_AlbumAvatar> createState() => _AlbumAvatarState();
-}
-
-class _AlbumAvatarState extends State<_AlbumAvatar>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _pulseController;
-  late Animation<double> _pulseAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _pulseController = AnimationController(
-      duration: const Duration(milliseconds: 1200),
-      vsync: this,
-    );
-    _pulseAnimation = Tween<double>(begin: 1, end: 1.08).animate(
-      CurvedAnimation(
-        parent: _pulseController,
-        curve: Curves.easeInOut,
-      ),
-    );
-  }
-
-  @override
-  void didUpdateWidget(_AlbumAvatar oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.isPlaying != oldWidget.isPlaying) {
-      if (widget.isPlaying) {
-        unawaited(_pulseController.repeat(reverse: true));
-      } else {
-        _pulseController.stop();
-        unawaited(
-          _pulseController.animateTo(
-            0,
-            duration: const Duration(milliseconds: 200),
-          ),
-        );
-      }
-    }
-  }
-
-  @override
-  void dispose() {
-    _pulseController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final coverHash = widget.track.album.coverHash;
-
-    Widget avatarContent;
-    if (coverHash == null) {
-      avatarContent = Icon(Icons.album, color: Colors.grey[600]);
-    } else {
-      final cache = Modular.get<CoverCacheService>();
-      final path = cache.getCoverPath(coverHash);
-      if (path == null) {
-        avatarContent = Icon(Icons.album, color: Colors.grey[600]);
-      } else {
-        final file = File(path);
-        avatarContent = Container(
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            image: DecorationImage(
-              image: ResizeImage(
-                FileImage(file),
-                width: 56,
-                height: 56,
-              ),
-              fit: BoxFit.cover,
-            ),
-          ),
-        );
-      }
-    }
-
-    return AnimatedBuilder(
-      animation: _pulseController,
-      builder: (context, child) => Transform.scale(
-        scale: widget.isPlaying ? _pulseAnimation.value : 1.0,
-        child: Container(
-          width: 48,
-          height: 48,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            boxShadow: widget.isPlaying
-                ? [
-                    BoxShadow(
-                      color: theme.primaryColor.withAlpha(102),
-                      blurRadius: 12,
-                      spreadRadius: 2,
-                    ),
-                  ]
-                : [
-                    BoxShadow(
-                      color: Colors.black.withAlpha(77),
-                      blurRadius: 6,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-          ),
-          child: ClipOval(child: child),
-        ),
-      ),
-      child: avatarContent,
     );
   }
 }
