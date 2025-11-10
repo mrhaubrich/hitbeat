@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_modular/flutter_modular.dart';
@@ -40,20 +42,30 @@ class _TrackPageState extends State<TrackPage> {
   final FocusNode _searchFocusNode = FocusNode();
   String _searchQuery = '';
   _SortOption _sortOption = _SortOption.nameAsc;
+  Timer? _debounceTimer;
 
   @override
   void initState() {
     super.initState();
     _bloc.add(const TrackSubscriptionRequested());
-    _searchController.addListener(() {
-      setState(() {
-        _searchQuery = _searchController.text.toLowerCase();
-      });
+    _searchController.addListener(_onSearchChanged);
+  }
+
+  void _onSearchChanged() {
+    // Debounce search to avoid lag on rapid typing
+    _debounceTimer?.cancel();
+    _debounceTimer = Timer(const Duration(milliseconds: 300), () {
+      if (mounted) {
+        setState(() {
+          _searchQuery = _searchController.text.toLowerCase();
+        });
+      }
     });
   }
 
   @override
   void dispose() {
+    _debounceTimer?.cancel();
     _searchController.dispose();
     _searchFocusNode.dispose();
     super.dispose();
@@ -106,262 +118,447 @@ class _TrackPageState extends State<TrackPage> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      body: Column(
-        children: [
-          // Search and sort bar
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: theme.scaffoldBackgroundColor,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withAlpha(25),
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                // Search field
-                Expanded(
-                  child: Focus(
-                    onFocusChange: (focused) => setState(() {}),
-                    child: TextField(
-                      controller: _searchController,
-                      focusNode: _searchFocusNode,
-                      decoration: InputDecoration(
-                        hintText: 'Search songs, artists, or albums…',
-                        hintStyle: TextStyle(color: Colors.grey[500]),
-                        prefixIcon: Icon(
-                          Icons.search,
-                          color: _searchFocusNode.hasFocus
-                              ? theme.primaryColor
-                              : Colors.grey[500],
-                        ),
-                        suffixIcon: _searchQuery.isNotEmpty
-                            ? IconButton(
-                                icon: const Icon(Icons.clear),
-                                onPressed: _searchController.clear,
-                                tooltip: 'Clear search',
-                              )
-                            : null,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide.none,
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(
-                            color: theme.primaryColor.withAlpha(128),
-                            width: 2,
+      body: FocusScope(
+        child: Column(
+          children: [
+            // Search and sort bar
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: theme.scaffoldBackgroundColor,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withAlpha(25),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  // Search field
+                  Expanded(
+                    child: Focus(
+                      onFocusChange: (focused) => setState(() {}),
+                      child: TextField(
+                        controller: _searchController,
+                        focusNode: _searchFocusNode,
+                        decoration: InputDecoration(
+                          hintText: 'Search songs, artists, or albums…',
+                          hintStyle: TextStyle(color: Colors.grey[500]),
+                          prefixIcon: Icon(
+                            Icons.search,
+                            color: _searchFocusNode.hasFocus
+                                ? theme.primaryColor
+                                : Colors.grey[500],
                           ),
-                        ),
-                        filled: true,
-                        fillColor: _searchFocusNode.hasFocus
-                            ? theme.cardColor.withAlpha(255)
-                            : theme.cardColor,
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 14,
+                          suffixIcon: _searchQuery.isNotEmpty
+                              ? IconButton(
+                                  icon: const Icon(Icons.clear),
+                                  onPressed: _searchController.clear,
+                                  tooltip: 'Clear search',
+                                )
+                              : null,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                              color: theme.primaryColor.withAlpha(128),
+                              width: 2,
+                            ),
+                          ),
+                          filled: true,
+                          fillColor: _searchFocusNode.hasFocus
+                              ? theme.cardColor.withAlpha(255)
+                              : theme.cardColor,
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 14,
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                // Sort button
-                PopupMenuButton<_SortOption>(
-                  icon: Icon(
-                    _sortOption.icon,
-                    color: theme.primaryColor,
+                  const SizedBox(width: 12),
+                  // Sort button
+                  Container(
+                    decoration: BoxDecoration(
+                      color: theme.cardColor,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: theme.primaryColor.withAlpha(77),
+                      ),
+                    ),
+                    child: PopupMenuButton<_SortOption>(
+                      icon: Icon(
+                        _sortOption.icon,
+                        color: theme.primaryColor,
+                        size: 22,
+                      ),
+                      tooltip: 'Sort by: ${_sortOption.label}',
+                      offset: const Offset(0, 8),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      onSelected: (option) {
+                        setState(() {
+                          _sortOption = option;
+                        });
+                      },
+                      itemBuilder: (context) =>
+                          _SortOption.values.map((option) {
+                            return PopupMenuItem(
+                              value: option,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 8,
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    option.icon,
+                                    size: 20,
+                                    color: _sortOption == option
+                                        ? theme.primaryColor
+                                        : Colors.grey[400],
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Text(
+                                    option.label,
+                                    style: TextStyle(
+                                      color: _sortOption == option
+                                          ? theme.primaryColor
+                                          : Colors.grey[200],
+                                      fontWeight: _sortOption == option
+                                          ? FontWeight.w600
+                                          : FontWeight.w400,
+                                    ),
+                                  ),
+                                  if (_sortOption == option) ...[
+                                    const Spacer(),
+                                    Icon(
+                                      Icons.check,
+                                      size: 18,
+                                      color: theme.primaryColor,
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                    ),
                   ),
-                  tooltip: 'Sort tracks',
-                  onSelected: (option) {
-                    setState(() {
-                      _sortOption = option;
-                    });
-                  },
-                  itemBuilder: (context) => _SortOption.values.map((option) {
-                    return PopupMenuItem(
-                      value: option,
-                      child: Row(
+                ],
+              ),
+            ),
+            // Track list
+            Expanded(
+              child: BlocBuilder<TrackBloc, TrackBlocState>(
+                bloc: _bloc,
+                builder: (context, state) {
+                  if (state is TrackLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (state is! TrackLoaded) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  final allTracks = state.tracks;
+                  final filteredTracks = _filterAndSortTracks(allTracks);
+
+                  if (allTracks.isEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(
-                            option.icon,
-                            size: 20,
-                            color: _sortOption == option
-                                ? theme.primaryColor
-                                : null,
+                          Container(
+                            padding: const EdgeInsets.all(24),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: theme.cardColor,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withAlpha(51),
+                                  blurRadius: 20,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: Icon(
+                              Icons.library_music_outlined,
+                              size: 64,
+                              color: Colors.grey[500],
+                            ),
                           ),
-                          const SizedBox(width: 12),
+                          const SizedBox(height: 32),
                           Text(
-                            option.label,
+                            'Your library is empty',
                             style: TextStyle(
-                              color: _sortOption == option
-                                  ? theme.primaryColor
-                                  : null,
-                              fontWeight: _sortOption == option
-                                  ? FontWeight.bold
-                                  : FontWeight.normal,
+                              color: Colors.grey[300],
+                              fontSize: 22,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.3,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            'Start by adding music from the Dashboard',
+                            style: TextStyle(
+                              color: Colors.grey[500],
+                              fontSize: 15,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          ElevatedButton.icon(
+                            onPressed: () {
+                              // Navigate to dashboard
+                              Modular.to.navigate('/dashboard');
+                            },
+                            icon: const Icon(Icons.add_circle_outline),
+                            label: const Text('Add Music'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: theme.primaryColor,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                                vertical: 14,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
                             ),
                           ),
                         ],
                       ),
                     );
-                  }).toList(),
-                ),
-              ],
-            ),
-          ),
-          // Track list
-          Expanded(
-            child: BlocBuilder<TrackBloc, TrackBlocState>(
-              bloc: _bloc,
-              builder: (context, state) {
-                if (state is TrackLoading) {
-                  return const Center(child: CircularProgressIndicator());
-                }
+                  }
 
-                if (state is! TrackLoaded) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-
-                final allTracks = state.tracks;
-                final filteredTracks = _filterAndSortTracks(allTracks);
-
-                if (allTracks.isEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.library_music_outlined,
-                          size: 80,
-                          color: Colors.grey[600],
-                        ),
-                        const SizedBox(height: 24),
-                        Text(
-                          'No tracks in your library',
-                          style: TextStyle(
-                            color: Colors.grey[400],
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Add some music from the Dashboard',
-                          style: TextStyle(
-                            color: Colors.grey[600],
-                            fontSize: 14,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-
-                if (filteredTracks.isEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.search_off,
-                          size: 64,
-                          color: Colors.grey[600],
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'No tracks found for "$_searchQuery"',
-                          style: TextStyle(
-                            color: Colors.grey[400],
-                            fontSize: 16,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Try a different search term',
-                          style: TextStyle(
-                            color: Colors.grey[600],
-                            fontSize: 14,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-
-                return Column(
-                  children: [
-                    // Track count header
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-                      child: Row(
+                  if (filteredTracks.isEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(
-                            '${filteredTracks.length} ${filteredTracks.length == 1 ? 'track' : 'tracks'}',
-                            style: TextStyle(
-                              color: Colors.grey[400],
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
+                          Container(
+                            padding: const EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: theme.cardColor,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withAlpha(51),
+                                  blurRadius: 16,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: Icon(
+                              Icons.search_off,
+                              size: 56,
+                              color: Colors.grey[500],
                             ),
                           ),
-                          if (_searchQuery.isNotEmpty) ...[
-                            Text(
-                              ' (filtered from ${allTracks.length})',
-                              style: TextStyle(
-                                color: Colors.grey[600],
-                                fontSize: 12,
+                          const SizedBox(height: 28),
+                          Text(
+                            'No results found',
+                            style: TextStyle(
+                              color: Colors.grey[300],
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Text.rich(
+                            TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: 'No tracks match ',
+                                  style: TextStyle(
+                                    color: Colors.grey[500],
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: '"$_searchQuery"',
+                                  style: TextStyle(
+                                    color: theme.primaryColor.withAlpha(204),
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            'Try a different search term',
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: 13,
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          OutlinedButton.icon(
+                            onPressed: () {
+                              _searchController.clear();
+                              _searchFocusNode.requestFocus();
+                            },
+                            icon: const Icon(Icons.clear_all),
+                            label: const Text('Clear Search'),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: theme.primaryColor,
+                              side: BorderSide(
+                                color: theme.primaryColor.withAlpha(128),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 12,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
                               ),
                             ),
-                          ],
+                          ),
                         ],
                       ),
-                    ),
-                    // Track list
-                    Expanded(
-                      child: ListView.builder(
-                        padding: const EdgeInsets.only(bottom: 16),
-                        itemCount: filteredTracks.length,
-                        itemBuilder: (context, index) {
-                          final track = filteredTracks[index];
+                    );
+                  }
 
-                          return TrackListTileEnhanced(
-                            track: track,
-                            player: _player,
-                            trackNumber: index + 1,
-                            onTap: () {
-                              final trackState = _player.trackState;
-                              final currentTrack = _player.currentTrack;
-                              final isCurrentTrack =
-                                  currentTrack?.path == track.path;
-
-                              final trackPlaybackState = isCurrentTrack
-                                  ? trackState
-                                  : TrackState.notPlaying;
-
-                              _bloc.add(
-                                TrackPlayPauseRequested(
-                                  track: track,
-                                  tracklist: filteredTracks,
-                                  isCurrentTrack: isCurrentTrack,
-                                  shouldPlay:
-                                      trackPlaybackState != TrackState.playing,
+                  return Column(
+                    children: [
+                      // Track count header with better visual design
+                      Container(
+                        padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              theme.scaffoldBackgroundColor,
+                              theme.scaffoldBackgroundColor.withAlpha(0),
+                            ],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.music_note,
+                              size: 16,
+                              color: Colors.grey[500],
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              '${filteredTracks.length} ${filteredTracks.length == 1 ? 'track' : 'tracks'}',
+                              style: TextStyle(
+                                color: Colors.grey[300],
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 0.3,
+                              ),
+                            ),
+                            if (_searchQuery.isNotEmpty) ...[
+                              const SizedBox(width: 4),
+                              Text(
+                                '(from ${allTracks.length})',
+                                style: TextStyle(
+                                  color: Colors.grey[600],
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w400,
                                 ),
-                              );
-                            },
-                          );
-                        },
+                              ),
+                            ],
+                            const Spacer(),
+                            if (_sortOption != _SortOption.nameAsc) ...[
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: theme.primaryColor.withAlpha(26),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: theme.primaryColor.withAlpha(51),
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      _sortOption.icon,
+                                      size: 14,
+                                      color: theme.primaryColor.withAlpha(204),
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      _sortOption.label.split(' ').first,
+                                      style: TextStyle(
+                                        color: theme.primaryColor.withAlpha(
+                                          204,
+                                        ),
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
-                );
-              },
+                      // Track list
+                      Expanded(
+                        child: ListView.builder(
+                          padding: const EdgeInsets.only(bottom: 16),
+                          itemCount: filteredTracks.length,
+                          itemBuilder: (context, index) {
+                            final track = filteredTracks[index];
+
+                            return AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 200),
+                              child: TrackListTileEnhanced(
+                                key: ValueKey(track.path),
+                                track: track,
+                                player: _player,
+                                trackNumber: index + 1,
+                                onTap: () {
+                                  final trackState = _player.trackState;
+                                  final currentTrack = _player.currentTrack;
+                                  final isCurrentTrack =
+                                      currentTrack?.path == track.path;
+
+                                  final trackPlaybackState = isCurrentTrack
+                                      ? trackState
+                                      : TrackState.notPlaying;
+
+                                  _bloc.add(
+                                    TrackPlayPauseRequested(
+                                      track: track,
+                                      tracklist: filteredTracks,
+                                      isCurrentTrack: isCurrentTrack,
+                                      shouldPlay:
+                                          trackPlaybackState !=
+                                          TrackState.playing,
+                                    ),
+                                  );
+                                },
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
