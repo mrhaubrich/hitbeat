@@ -324,7 +324,7 @@ class _AlbumAvatarState extends State<_AlbumAvatar>
       duration: const Duration(milliseconds: 1200),
       vsync: this,
     );
-    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.08).animate(
+    _pulseAnimation = Tween<double>(begin: 1, end: 1.08).animate(
       CurvedAnimation(
         parent: _pulseController,
         curve: Curves.easeInOut,
@@ -340,7 +340,10 @@ class _AlbumAvatarState extends State<_AlbumAvatar>
         _pulseController.repeat(reverse: true);
       } else {
         _pulseController.stop();
-        _pulseController.animateTo(0, duration: const Duration(milliseconds: 200));
+        _pulseController.animateTo(
+          0,
+          duration: const Duration(milliseconds: 200),
+        );
       }
     }
   }
