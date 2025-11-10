@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 
 /// {@template animated_logo}
@@ -19,9 +17,10 @@ class AnimatedLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Lighter animation: scale-only (remove rotation) and shorter duration.
     return RepaintBoundary(
       child: TweenAnimationBuilder<double>(
-        duration: const Duration(milliseconds: 250),
+        duration: const Duration(milliseconds: 180),
         curve: Curves.easeOutCubic,
         tween: Tween<double>(
           begin: 0,
@@ -34,13 +33,9 @@ class AnimatedLogo extends StatelessWidget {
           filterQuality: FilterQuality.low,
         ),
         builder: (context, value, child) {
-          final scale = 1 + (value * 0.2);
-          final angle = value * 2 * math.pi;
-          return Transform(
-            alignment: Alignment.center,
-            transform: Matrix4.identity()
-              ..rotateZ(angle)
-              ..scale(scale, scale),
+          final scale = 1 + (value * 0.12);
+          return Transform.scale(
+            scale: scale,
             child: child,
           );
         },

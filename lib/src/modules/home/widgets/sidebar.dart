@@ -1,174 +1,68 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_modular/flutter_modular.dart';
-import 'package:hitbeat/src/modules/home/widgets/animated_logo.dart';
-import 'package:hitbeat/src/theme/sidebar_theme_extension.dart';
-import 'package:sidebarx/sidebarx.dart';
+import 'package:hitbeat/src/modules/home/widgets/enhanced_sidebar.dart';
+
+export 'package:hitbeat/src/modules/home/widgets/enhanced_sidebar.dart';
 
 /// The controller of the sidebar.
-class MySideBarController extends SidebarXController {
+///
+/// This is now a compatibility wrapper around [EnhancedSidebarController].
+class MySideBarController extends EnhancedSidebarController {
   /// Creates a new sidebar controller.
-  MySideBarController() : super(selectedIndex: 0);
+  MySideBarController() : super(initialIndex: 0);
 }
 
-/// The sidebar widget.
+/// The sidebar widget with enhanced styling and animations.
 class Sidebar extends StatelessWidget {
   /// Creates a new sidebar widget.
   const Sidebar({
-    required SidebarXController controller,
+    required EnhancedSidebarController controller,
     super.key,
   }) : _controller = controller;
 
-  static final _items = [
-    _SidebarItem(
+  static final _mainItems = [
+    const SidebarMenuItem(
       icon: Icons.dashboard,
       label: 'Dashboard',
       route: '/dashboard/',
+      tooltip: 'Dashboard',
     ),
-    _SidebarItem(
+    const SidebarMenuItem(
       icon: Icons.queue_music,
       label: 'Tracks',
       route: '/tracks/',
+      tooltip: 'View all tracks',
     ),
-    _SidebarItem(
+    const SidebarMenuItem(
       icon: Icons.icecream,
       label: 'Ice-Cream',
       route: '/ice-cream/',
+      tooltip: 'Ice-Cream mode',
     ),
-    _SidebarItem(
+    const SidebarMenuItem(
       icon: Icons.search,
       label: 'Search',
       route: '/search/',
+      tooltip: 'Search music',
     ),
   ];
+
   static final _footerItems = [
-    _SidebarItem(
+    const SidebarMenuItem(
       icon: Icons.settings,
       label: 'Settings',
       route: '/settings/',
+      tooltip: 'Application settings',
     ),
   ];
 
-  final SidebarXController _controller;
+  final EnhancedSidebarController _controller;
 
   @override
   Widget build(BuildContext context) {
-    final sidebarTheme = Theme.of(context).extension<SidebarThemeExtension>()!;
-    final selectedItemDecoration = BoxDecoration(
-      borderRadius: BorderRadius.circular(10),
-      // Simpler decoration to reduce paint cost during sidebar animation
-      color: sidebarTheme.actionColor.withValues(alpha: 0.12),
-      border: Border.all(
-        color: sidebarTheme.actionColor.withValues(alpha: 0.37),
-      ),
-    );
-
-    return RepaintBoundary(
-      child: SidebarX(
-        controller: _controller,
-        theme: SidebarXTheme(
-          margin: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: sidebarTheme.canvasColor,
-            borderRadius: BorderRadius.circular(20),
-          ),
-          textStyle: TextStyle(color: sidebarTheme.textColor),
-          selectedTextStyle: TextStyle(color: sidebarTheme.textColor),
-          itemTextPadding: const EdgeInsets.only(left: 30),
-          selectedItemTextPadding: const EdgeInsets.only(left: 30),
-          itemDecoration: BoxDecoration(
-            border: Border.all(color: sidebarTheme.canvasColor),
-          ),
-          selectedIconTheme: IconThemeData(
-            color: sidebarTheme.activeIconColor,
-            size: 24,
-          ),
-          selectedItemDecoration: selectedItemDecoration,
-          iconTheme: IconThemeData(
-            color: sidebarTheme.textColor,
-            size: 20,
-          ),
-        ),
-        extendedTheme: SidebarXTheme(
-          width: 250,
-          decoration: BoxDecoration(
-            color: sidebarTheme.canvasColor,
-            borderRadius: BorderRadius.circular(20),
-          ),
-          margin: const EdgeInsets.all(10),
-        ),
-        footerDivider: Divider(
-          color: sidebarTheme.textColor,
-          thickness: 0.5,
-        ),
-        headerBuilder: (context, extended) {
-          return SizedBox(
-            width: double.infinity,
-            child: InkWell(
-              borderRadius: BorderRadius.circular(20),
-              onTap: _controller.toggleExtended,
-              child: DrawerHeader(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    RepaintBoundary(child: AnimatedLogo(extended: extended)),
-                    // Animate only the size/opacity area; clip repaint region.
-                    ClipRect(
-                      child: RepaintBoundary(
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 250),
-                          height: extended ? 50 : 0,
-                          margin: extended
-                              ? const EdgeInsets.only(top: 10)
-                              : EdgeInsets.zero,
-                          curve: Curves.easeOutCubic,
-                          child: AnimatedOpacity(
-                            duration: const Duration(milliseconds: 200),
-                            opacity: extended ? 1 : 0,
-                            child: Text(
-                              'HitBeat',
-                              style: TextStyle(
-                                color: sidebarTheme.textColor,
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              softWrap: false,
-                              overflow: TextOverflow.fade,
-                              maxLines: 1,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        },
-        items: _items,
-        footerItems: _footerItems,
-        footerFitType: FooterFitType.fit,
-        toggleButtonBuilder: (context, extended) {
-          return const SizedBox(
-            height: 10,
-          );
-        },
-      ),
+    return EnhancedSidebar(
+      controller: _controller,
+      mainItems: _mainItems,
+      footerItems: _footerItems,
     );
   }
-}
-
-class _SidebarItem extends SidebarXItem {
-  _SidebarItem({
-    required this.route,
-    super.icon,
-    super.label,
-    dynamic Function()? onTap,
-  }) : super(
-         onTap: () {
-           Modular.to.navigate(route);
-           if (onTap != null) onTap();
-         },
-       );
-  final String route;
 }

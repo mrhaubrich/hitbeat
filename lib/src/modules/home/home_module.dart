@@ -7,14 +7,13 @@ import 'package:hitbeat/src/modules/home/modules/settings/settings_module.dart';
 import 'package:hitbeat/src/modules/home/modules/track/track_module.dart';
 import 'package:hitbeat/src/modules/home/pages/home_page.dart';
 import 'package:hitbeat/src/modules/home/widgets/sidebar.dart';
-import 'package:sidebarx/sidebarx.dart';
 
 /// The Home module of the application.
 class HomeModule extends Module {
   @override
   void binds(Injector i) {
     i
-      ..add<SidebarXController>(MySideBarController.new)
+      ..add<EnhancedSidebarController>(MySideBarController.new)
       ..addSingleton<MenuBarController>(MenuBarController.new);
   }
 

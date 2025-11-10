@@ -4,30 +4,33 @@ import 'package:hitbeat/src/modules/bottom_bar/bottom_bar.dart';
 import 'package:hitbeat/src/modules/home/widgets/sidebar.dart';
 
 /// A scaffold with a sidebar.
-class DesktopScaffold extends StatelessWidget {
-  /// A scaffold with a sidebar.
+class DesktopScaffold extends StatefulWidget {
+  /// Creates a new desktop scaffold.
   const DesktopScaffold({super.key});
+
+  @override
+  State<DesktopScaffold> createState() => _DesktopScaffoldState();
+}
+
+class _DesktopScaffoldState extends State<DesktopScaffold> {
+  late final EnhancedSidebarController _sidebarController = Modular.get();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
+      body: Row(
+        // Remove one Column layer for simpler layout & less rebuild cost
         children: [
-          Expanded(
-            child: Row(
-              children: [
-                Sidebar(
-                  controller: Modular.get(),
-                ),
-                const Expanded(
-                  child: RouterOutlet(),
-                ),
-              ],
+          Sidebar(controller: _sidebarController),
+          // Main content with its own repaint boundary
+          const Expanded(
+            child: RepaintBoundary(
+              child: RouterOutlet(),
             ),
           ),
-          const BottomBar(),
         ],
       ),
+      bottomNavigationBar: const BottomBar(),
     );
   }
 }
