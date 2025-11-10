@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -64,9 +65,9 @@ class _TrackListTileEnhancedState extends State<TrackListTileEnhanced>
   void _onHoverChanged(bool isHovered) {
     setState(() => _isHovered = isHovered);
     if (isHovered) {
-      _animationController.forward();
+      unawaited(_animationController.forward());
     } else {
-      _animationController.reverse();
+      unawaited(_animationController.reverse());
     }
   }
 
