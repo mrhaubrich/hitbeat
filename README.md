@@ -26,9 +26,9 @@
 - [📝 Table of Contents](#-table-of-contents)
 - [🧐 About ](#-about-)
 - [🎈 Usage ](#-usage-)
+  - [Switching Audio Backend](#switching-audio-backend)
 - [⛏️ Built Using ](#️-built-using-)
 - [✍️ Authors ](#️-authors-)
-- [📝 TODO ][todoReference]
 
 ## 🧐 About <a name = "about"></a>
 
@@ -68,7 +68,6 @@ To switch to SoLoud:
 2. Uncomment the import line for `audio_player_soloud.dart`.
 3. Replace the `addSingleton<IAudioPlayer>(AudioPlayerJustAudio.new)` line with:
   `..addSingleton<IAudioPlayer>(AudioPlayerSoLoud.new)`
-4. (Optional) Remove the `just_audio_media_kit` initialization in `main.dart` if not needed.
 
 Re-run:
 ```bash

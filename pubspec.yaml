@@ -28,13 +28,8 @@ dependencies:
   flutter_modular: ^6.4.1
   flutter_soloud: any
   interactive_slider: ^0.5.1
-  just_audio: ^0.10.5
-  just_audio_media_kit: ^2.1.0
   lottie: ^3.3.2
   marquee: ^2.3.0
-  media_kit_libs_linux: ^1.2.1
-  media_kit_libs_macos_audio: ^1.1.4
-  media_kit_libs_windows_audio: ^1.0.9
   menubar:
     git:
       url: https://github.com/google/flutter-desktop-embedding.git
