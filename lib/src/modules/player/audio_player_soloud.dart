@@ -145,7 +145,11 @@ class AudioPlayerSoLoud implements IAudioPlayer {
         await next();
         return;
       case Repeat.none:
-        // stay stopped at end
+        // Check if there's a next track in the playlist
+        if (_currentIndex + 1 < _playlist.length) {
+          await next();
+        }
+        // Otherwise, stay stopped at end
         return;
     }
   }
