@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:hitbeat/src/modules/player/interfaces/player.dart';
 import 'package:hitbeat/src/modules/player/models/track.dart';
 import 'package:interactive_slider/interactive_slider.dart';
+import 'package:widget_mask/widget_mask.dart';
 
 /// {@template progress_slider}
 /// A widget that displays the song progress slider.
@@ -89,9 +90,20 @@ class _ProgressSliderState extends State<ProgressSlider> {
           return ValueListenableBuilder<Duration?>(
             valueListenable: _hoverPositionNotifier,
             builder: (context, hoverPosition, _) {
-              return Text(
-                _formatDuration(hoverPosition ?? Duration.zero),
-                style: const TextStyle(color: Colors.white, fontSize: 12),
+              return WidgetMask(
+                blendMode: BlendMode.difference,
+                mask: Center(
+                  child: Text(
+                    _formatDuration(hoverPosition ?? Duration.zero),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+                child: Container(
+                  color: Colors.transparent,
+                ),
               );
             },
           );

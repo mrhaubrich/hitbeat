@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:interactive_slider/interactive_slider.dart';
+import 'package:widget_mask/widget_mask.dart';
 
 /// {@template volume_control}
 /// A widget that displays a volume control.
@@ -26,6 +27,7 @@ class VolumeControl extends StatefulWidget {
 
 class _VolumeControlState extends State<VolumeControl> {
   double? hoverVolume;
+  final GlobalKey _sliderBackgroundKey = GlobalKey();
 
   String _formatVolume(double volume) {
     return '${(volume * 100).round()}%';
@@ -36,33 +38,48 @@ class _VolumeControlState extends State<VolumeControl> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        InteractiveSlider(
-          padding: const EdgeInsets.symmetric(horizontal: 4),
-          initialProgress: widget.volume,
-          startIcon: const Icon(Icons.volume_mute, color: Colors.white),
-          endIcon: const Icon(Icons.volume_up, color: Colors.white),
-          centerIcon: hoverVolume == null
-              ? null
-              : Text(
-                  _formatVolume(hoverVolume!),
-                  style: const TextStyle(color: Colors.white, fontSize: 12),
-                ),
-          onProgressUpdated: (value) {
-            setState(() {
-              hoverVolume = null;
-            });
-          },
-          onFocused: (value) {
-            setState(() {
-              hoverVolume = value;
-            });
-          },
-          onChanged: (value) async {
-            setState(() {
-              hoverVolume = value;
-            });
-            await widget.onVolumeChanged(value);
-          },
+        RepaintBoundary(
+          key: _sliderBackgroundKey,
+          child: InteractiveSlider(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            initialProgress: widget.volume,
+            startIcon: const Icon(Icons.volume_mute, color: Colors.white),
+            endIcon: const Icon(Icons.volume_up, color: Colors.white),
+            centerIcon: hoverVolume == null
+                ? null
+                : WidgetMask(
+                    blendMode: BlendMode.difference,
+                    mask: Center(
+                      child: Text(
+                        _formatVolume(hoverVolume!),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    child: Container(
+                      color: Colors.transparent,
+                    ),
+                  ),
+            onProgressUpdated: (value) {
+              setState(() {
+                hoverVolume = null;
+              });
+            },
+            onFocused: (value) {
+              setState(() {
+                hoverVolume = value;
+              });
+            },
+            onChanged: (value) async {
+              setState(() {
+                hoverVolume = value;
+              });
+              await widget.onVolumeChanged(value);
+            },
+          ),
         ),
       ],
     );
