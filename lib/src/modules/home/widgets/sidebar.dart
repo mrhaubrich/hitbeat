@@ -33,10 +33,10 @@ class Sidebar extends StatelessWidget {
       tooltip: 'View all tracks',
     ),
     const SidebarMenuItem(
-      icon: Icons.icecream,
-      label: 'Ice-Cream',
-      route: '/ice-cream/',
-      tooltip: 'Ice-Cream mode',
+      icon: Icons.playlist_play,
+      label: 'Playlists',
+      route: '/playlists/',
+      tooltip: 'Manage playlists',
     ),
     const SidebarMenuItem(
       icon: Icons.search,

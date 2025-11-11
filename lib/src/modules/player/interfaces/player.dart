@@ -54,6 +54,9 @@ abstract class IAudioPlayer {
   /// The current track
   Track? get currentTrack;
 
+  /// The current index in the tracklist
+  int get currentIndex;
+
   /// Shuffle the tracklist
   bool get shuffle;
 
@@ -95,6 +98,9 @@ abstract class IAudioPlayer {
 
   /// Stream of the current track
   Stream<Track?> get currentTrack$;
+
+  /// Stream of the current index in the tracklist
+  Stream<int> get currentIndex$;
 
   /// Stream of the current volume
   Stream<double> get volume$;

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:hitbeat/src/modules/home/modules/track/blocs/track_bloc.dart';
+import 'package:hitbeat/src/modules/home/modules/track/widgets/track_context_menu.dart';
 import 'package:hitbeat/src/modules/home/modules/track/widgets/track_list_tile_enhanced.dart';
 import 'package:hitbeat/src/modules/player/enums/track_state.dart';
 import 'package:hitbeat/src/modules/player/interfaces/player.dart';
@@ -594,32 +595,35 @@ class _TrackPageState extends State<TrackPage> {
                                     ),
                                   );
                                 },
-                                child: TrackListTileEnhanced(
-                                  key: ValueKey(track.path),
+                                child: TrackContextMenu(
                                   track: track,
-                                  player: _player,
-                                  trackNumber: index + 1,
-                                  onTap: () {
-                                    final trackState = _player.trackState;
-                                    final currentTrack = _player.currentTrack;
-                                    final isCurrentTrack =
-                                        currentTrack?.path == track.path;
+                                  child: TrackListTileEnhanced(
+                                    key: ValueKey(track.path),
+                                    track: track,
+                                    player: _player,
+                                    trackNumber: index + 1,
+                                    onTap: () {
+                                      final trackState = _player.trackState;
+                                      final currentTrack = _player.currentTrack;
+                                      final isCurrentTrack =
+                                          currentTrack?.path == track.path;
 
-                                    final trackPlaybackState = isCurrentTrack
-                                        ? trackState
-                                        : TrackState.notPlaying;
+                                      final trackPlaybackState = isCurrentTrack
+                                          ? trackState
+                                          : TrackState.notPlaying;
 
-                                    _bloc.add(
-                                      TrackPlayPauseRequested(
-                                        track: track,
-                                        tracklist: filteredTracks,
-                                        isCurrentTrack: isCurrentTrack,
-                                        shouldPlay:
-                                            trackPlaybackState !=
-                                            TrackState.playing,
-                                      ),
-                                    );
-                                  },
+                                      _bloc.add(
+                                        TrackPlayPauseRequested(
+                                          track: track,
+                                          tracklist: filteredTracks,
+                                          isCurrentTrack: isCurrentTrack,
+                                          shouldPlay:
+                                              trackPlaybackState !=
+                                              TrackState.playing,
+                                        ),
+                                      );
+                                    },
+                                  ),
                                 ),
                               );
                             },

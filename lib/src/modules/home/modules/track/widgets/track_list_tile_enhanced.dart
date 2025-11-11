@@ -25,6 +25,7 @@ class TrackListTileEnhanced extends StatefulWidget {
     required this.onTap,
     required this.player,
     this.trackNumber,
+    this.playlistIndex,
     super.key,
   });
 
@@ -39,6 +40,9 @@ class TrackListTileEnhanced extends StatefulWidget {
 
   /// The track number in the list
   final int? trackNumber;
+
+  /// The index of this track in the playlist (for duplicate detection)
+  final int? playlistIndex;
 
   @override
   State<TrackListTileEnhanced> createState() => _TrackListTileEnhancedState();
@@ -96,27 +100,42 @@ class _TrackListTileEnhancedState extends State<TrackListTileEnhanced>
               child: StreamBuilder<Track?>(
                 stream: widget.player.currentTrack$,
                 builder: (context, currentTrackSnapshot) {
-                  return StreamBuilder<TrackState>(
-                    stream: widget.player.trackState$,
-                    builder: (context, trackStateSnapshot) {
-                      final trackState =
-                          trackStateSnapshot.data ?? TrackState.notPlaying;
-                      final isCurrentTrack =
-                          currentTrackSnapshot.data == widget.track;
-                      final isPlaying =
-                          isCurrentTrack && trackState == TrackState.playing;
+                  return StreamBuilder<int>(
+                    stream: widget.player.currentIndex$,
+                    builder: (context, currentIndexSnapshot) {
+                      return StreamBuilder<TrackState>(
+                        stream: widget.player.trackState$,
+                        builder: (context, trackStateSnapshot) {
+                          final trackState =
+                              trackStateSnapshot.data ?? TrackState.notPlaying;
+                          final currentTrack = currentTrackSnapshot.data;
+                          final currentIndex = currentIndexSnapshot.data ?? -1;
 
-                      return TrackTileContent(
-                        track: widget.track,
-                        trackNumber: widget.trackNumber,
-                        isCurrentTrack: isCurrentTrack,
-                        isPlaying: isPlaying,
-                        trackState: trackState,
-                        isHovered: _isHovered,
-                        onTap: widget.onTap,
-                        onTapDown: () => setState(() => _isPressed = true),
-                        onTapUp: () => setState(() => _isPressed = false),
-                        onTapCancel: () => setState(() => _isPressed = false),
+                          // Check if this is the current track
+                          // If playlistIndex is provided, also check index to handle duplicates
+                          final isCurrentTrack =
+                              currentTrack == widget.track &&
+                              (widget.playlistIndex == null ||
+                                  currentIndex == widget.playlistIndex);
+
+                          final isPlaying =
+                              isCurrentTrack &&
+                              trackState == TrackState.playing;
+
+                          return TrackTileContent(
+                            track: widget.track,
+                            trackNumber: widget.trackNumber,
+                            isCurrentTrack: isCurrentTrack,
+                            isPlaying: isPlaying,
+                            trackState: trackState,
+                            isHovered: _isHovered,
+                            onTap: widget.onTap,
+                            onTapDown: () => setState(() => _isPressed = true),
+                            onTapUp: () => setState(() => _isPressed = false),
+                            onTapCancel: () =>
+                                setState(() => _isPressed = false),
+                          );
+                        },
                       );
                     },
                   );

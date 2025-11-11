@@ -22,6 +22,7 @@ class AudioPlayerSoLoud implements IAudioPlayer {
     _repeatController = BehaviorSubject<Repeat>.seeded(Repeat.none);
     _shuffleController = BehaviorSubject<bool>.seeded(false);
     _tracklistController = BehaviorSubject<List<Track>>.seeded(const []);
+    _currentIndexController = BehaviorSubject<int>.seeded(-1);
     unawaited(_init());
   }
 
@@ -45,6 +46,7 @@ class AudioPlayerSoLoud implements IAudioPlayer {
   late final BehaviorSubject<Repeat> _repeatController;
   late final BehaviorSubject<bool> _shuffleController;
   late final BehaviorSubject<List<Track>> _tracklistController;
+  late final BehaviorSubject<int> _currentIndexController;
 
   // Timing helpers
   Timer? _ticker;
@@ -77,11 +79,18 @@ class AudioPlayerSoLoud implements IAudioPlayer {
     unawaited(_repeatController.close());
     unawaited(_shuffleController.close());
     unawaited(_tracklistController.close());
+    unawaited(_currentIndexController.close());
   }
 
   String _normalizePath(String path) {
     if (path.startsWith('file://')) return path.replaceFirst('file://', '');
     return path;
+  }
+
+  /// Helper to update _currentIndex and notify listeners
+  void _setCurrentIndex(int index) {
+    _currentIndex = index;
+    _currentIndexController.add(index);
   }
 
   Future<void> _loadAndPlayCurrent({bool autoPlay = true}) async {
@@ -169,8 +178,10 @@ class AudioPlayerSoLoud implements IAudioPlayer {
     _currentIndex = _playlist.indexWhere((t) => t == track);
     if (_currentIndex < 0) {
       _playlist.add(track);
-      _currentIndex = _playlist.length - 1;
+      _setCurrentIndex(_playlist.length - 1);
       _tracklistController.add(List.unmodifiable(_playlist));
+    } else {
+      _setCurrentIndex(_currentIndex);
     }
 
     await _loadAndPlayCurrent();
@@ -206,8 +217,10 @@ class AudioPlayerSoLoud implements IAudioPlayer {
     _currentIndex = _playlist.indexWhere((t) => t == newSong);
     if (_currentIndex < 0) {
       _playlist.insert(0, newSong);
-      _currentIndex = 0;
+      _setCurrentIndex(0);
       _tracklistController.add(List.unmodifiable(_playlist));
+    } else {
+      _setCurrentIndex(_currentIndex);
     }
     if (_currentHandle != null) {
       await _sl.stop(_currentHandle!);
@@ -219,7 +232,7 @@ class AudioPlayerSoLoud implements IAudioPlayer {
   @override
   Future<void> clearTracklist() async {
     _playlist.clear();
-    _currentIndex = -1;
+    _setCurrentIndex(-1);
     _tracklistController.add(const []);
     _trackController.add(null);
     _timeController.add(Duration.zero);
@@ -247,9 +260,9 @@ class AudioPlayerSoLoud implements IAudioPlayer {
     if (_shuffleController.value) {
       final nextIndex =
           (_currentIndex + 1 + (_playlist.length * 37)) % _playlist.length;
-      _currentIndex = nextIndex;
+      _setCurrentIndex(nextIndex);
     } else {
-      _currentIndex = (_currentIndex + 1) % _playlist.length;
+      _setCurrentIndex((_currentIndex + 1) % _playlist.length);
     }
     if (_currentHandle != null) {
       await _sl.stop(_currentHandle!);
@@ -266,9 +279,9 @@ class AudioPlayerSoLoud implements IAudioPlayer {
       await setCurrentTime(Duration.zero);
       return;
     }
-    _currentIndex = (_currentIndex - 1) < 0
-        ? _playlist.length - 1
-        : _currentIndex - 1;
+    _setCurrentIndex(
+      (_currentIndex - 1) < 0 ? _playlist.length - 1 : _currentIndex - 1,
+    );
     if (_currentHandle != null) {
       await _sl.stop(_currentHandle!);
     }
@@ -384,6 +397,12 @@ class AudioPlayerSoLoud implements IAudioPlayer {
 
   @override
   Stream<Track?> get currentTrack$ => _trackController.stream.distinct();
+
+  @override
+  int get currentIndex => _currentIndex;
+
+  @override
+  Stream<int> get currentIndex$ => _currentIndexController.stream.distinct();
 
   @override
   Stream<double> get volume$ => _volumeController.stream;

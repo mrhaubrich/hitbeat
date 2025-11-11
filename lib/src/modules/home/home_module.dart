@@ -1,12 +1,12 @@
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:hitbeat/src/modules/home/controllers/menu_bar_controller.dart';
 import 'package:hitbeat/src/modules/home/modules/dashboard/dashboard_module.dart';
-import 'package:hitbeat/src/modules/home/modules/ice_cream/ice_cream_module.dart';
 import 'package:hitbeat/src/modules/home/modules/search/search_module.dart';
 import 'package:hitbeat/src/modules/home/modules/settings/settings_module.dart';
 import 'package:hitbeat/src/modules/home/modules/track/track_module.dart';
 import 'package:hitbeat/src/modules/home/pages/home_page.dart';
 import 'package:hitbeat/src/modules/home/widgets/sidebar.dart';
+import 'package:hitbeat/src/modules/playlist/playlist_module.dart';
 
 /// The Home module of the application.
 class HomeModule extends Module {
@@ -27,7 +27,7 @@ class HomeModule extends Module {
         ParallelRoute.module('/settings', module: SettingsModule()),
         ParallelRoute.module('/dashboard', module: DashboardModule()),
         ParallelRoute.module('/tracks', module: TrackModule()),
-        ParallelRoute.module('/ice-cream', module: IceCreamModule()),
+        ParallelRoute.module('/playlists', module: PlaylistModule()),
         ParallelRoute.module('/search', module: SearchModule()),
       ],
       transition: TransitionType.fadeIn,
