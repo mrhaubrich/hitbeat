@@ -45,11 +45,14 @@ class _BottomBarState extends State<BottomBar> {
         left: 10,
         right: 10,
       ),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: Theme.of(context).primaryColor.withValues(alpha: 0.9),
-          borderRadius: const BorderRadius.all(Radius.circular(14)),
+      child: Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14),
+          side: BorderSide(
+            color: Theme.of(context).primaryColor,
+          ),
         ),
+        margin: EdgeInsets.zero,
         child: SizedBox(
           height: kBottomBarHeight,
           child: Row(

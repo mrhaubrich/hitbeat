@@ -57,24 +57,52 @@ class TrackTileContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final listTileTheme = theme.listTileTheme;
+
+    // Get theme values with fallbacks
+    final contentPadding =
+        listTileTheme.contentPadding ??
+        const EdgeInsets.symmetric(horizontal: 16, vertical: 12);
+    final horizontalGap = listTileTheme.horizontalTitleGap ?? 14.0;
+    final shape =
+        listTileTheme.shape ??
+        RoundedRectangleBorder(borderRadius: BorderRadius.circular(8));
+    final borderRadius = shape is RoundedRectangleBorder
+        ? shape.borderRadius.resolve(Directionality.of(context))
+        : BorderRadius.circular(8);
+
+    // Get color values from theme
+    final tileColor = listTileTheme.tileColor ?? Colors.transparent;
+    final backgroundColor = tileColor;
+
+    final hoverColor = listTileTheme.tileColor != null
+        ? Color.alphaBlend(
+            theme.primaryColor.withAlpha(10),
+            listTileTheme.tileColor!,
+          )
+        : theme.primaryColor.withAlpha(10);
+    final splashColor = theme.primaryColor.withAlpha(40);
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 250),
       curve: Curves.easeOutCubic,
       decoration: BoxDecoration(
+        color: backgroundColor,
         border: Border(
           left: BorderSide(
-            color: isCurrentTrack ? theme.primaryColor : Colors.transparent,
+            color: theme.primaryColor,
             width: 4,
           ),
         ),
         gradient: isCurrentTrack
             ? LinearGradient(
                 colors: [
-                  theme.primaryColor.withAlpha(30),
-                  Colors.transparent,
+                  theme.primaryColor.withAlpha(20),
+                  backgroundColor,
+                  backgroundColor.withAlpha(200),
                 ],
-                stops: const [0.0, 0.6],
+                stops: const [0.0, 0.45, 0.9],
+                transform: const GradientRotation(1.2),
               )
             : null,
       ),
@@ -85,14 +113,11 @@ class TrackTileContent extends StatelessWidget {
           onTapDown: (_) => onTapDown(),
           onTapUp: (_) => onTapUp(),
           onTapCancel: onTapCancel,
-          borderRadius: BorderRadius.circular(8),
-          hoverColor: theme.primaryColor.withAlpha(10),
-          splashColor: theme.primaryColor.withAlpha(40),
+          borderRadius: borderRadius,
+          hoverColor: hoverColor,
+          splashColor: splashColor,
           child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 12,
-            ),
+            padding: contentPadding,
             child: Row(
               children: [
                 TrackNumberIndicator(
@@ -100,25 +125,25 @@ class TrackTileContent extends StatelessWidget {
                   isPlaying: isPlaying,
                   isCurrentTrack: isCurrentTrack,
                 ),
-                const SizedBox(width: 14),
+                SizedBox(width: horizontalGap),
                 AnimatedScale(
                   duration: const Duration(milliseconds: 150),
                   scale: isHovered ? 1.05 : 1.0,
                   child: TrackAlbumAvatar(track: track, isPlaying: isPlaying),
                 ),
-                const SizedBox(width: 18),
+                SizedBox(width: horizontalGap),
                 Expanded(
                   child: TrackInfoSection(
                     track: track,
                     isCurrentTrack: isCurrentTrack,
                   ),
                 ),
-                const SizedBox(width: 18),
+                SizedBox(width: horizontalGap),
                 TrackDuration(
                   duration: track.duration,
                   isCurrentTrack: isCurrentTrack,
                 ),
-                const SizedBox(width: 18),
+                SizedBox(width: horizontalGap),
                 TrackActionButton(
                   trackState: trackState,
                   isCurrentTrack: isCurrentTrack,
